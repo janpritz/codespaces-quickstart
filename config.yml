@@ -1,0 +1,14 @@
+recipe: default.v1
+language: en
+pipeline:
+- name: NLUCommandAdapter   
+- name: CompactLLMCommandGenerator
+  llm:
+    model_group: rasa_command_generation_model
+  flow_retrieval:
+    active: false
+
+policies:
+- name: FlowPolicy
+#  - name: EnterpriseSearchPolicy
+assistant_id: 20250908-173319-rounded-driver

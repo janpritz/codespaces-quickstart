@@ -1,0 +1,17 @@
+flows:
+  greet_flow:
+    description: Flow to greet user and collect their username
+    steps:
+      - id: greet
+        action: utter_greet
+        next: ask_username
+
+      - id: ask_username
+        description: Ask the user for their name
+        collect: username
+        next: set_visited
+      
+      - id: set_visited
+        set_slots:
+          - visited: true
+        next: END

@@ -1,0 +1,29 @@
+flows:
+  pattern_search:
+    description: Flow for handling knowledge-based questions or request
+    name: pattern search
+    steps:
+      - action: action_trigger_search
+
+  pattern_correction:
+    description: Confirm a previous correction of a slot value.
+    steps:
+      - noop: true
+        next:
+          - if: context.is_reset_only
+            then:
+              - action: action_correct_flow_slot
+                next: END
+          - else: confirm_first
+      - id: confirm_first
+        collect: confirm_slot_correction
+        next:
+          - if: not slots.confirm_slot_correction
+            then:
+              - action: utter_not_corrected_previous_input
+                next: END
+          - else:
+              - action: action_correct_flow_slot
+              - action: utter_corrected_previous_input
+                next: END
+  

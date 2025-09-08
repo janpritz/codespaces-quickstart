@@ -1,0 +1,612 @@
+version: "3.1"
+
+slots:
+  bscrim_new:
+    influence_conversation: true
+    mappings:
+    - condition: slots.enrollee_type = "Freshman" and slots.enrollment_category =
+        "requirements"
+      type: from_llm
+    type: categorical
+    values:
+    - Yes
+    - No
+  clarified_question:
+    influence_conversation: true
+    initial_value: null
+    mappings:
+    - type: from_llm
+    type: text
+  confirm_correction:
+    mappings:
+    - type: from_llm
+    type: bool
+  confirm_slot_correction:
+    type: bool
+  consecutive_silence_timeouts:
+    initial_value: 0.0
+    max_value: 1000000
+    type: float
+  enrollee_type:
+    influence_conversation: true
+    mappings:
+    - type: from_llm
+    type: categorical
+    validation:
+      refill_utter: utter_refill_enrollee_type
+      rejections:
+      - if: not ({'Freshman' 'Continuing' 'Returning' 'Transferee'} contains slots.enrollee_type)
+        utter: utter_invalid_enrollee_type
+    values:
+    - Freshman
+    - Continuing
+    - Returning
+    - Transferee
+  enrollment_category:
+    influence_conversation: true
+    mappings:
+    - type: from_llm
+    type: categorical
+    validation:
+      refill_utter: utter_refill_enrollment_category
+      rejections:
+      - if: not ({'procedure' 'requirements' 'schedule'} contains slots.enrollment_category)
+        utter: utter_invalid_enrollment_category
+    values:
+    - procedure
+    - requirements
+    - schedule
+  error_count:
+    influence_conversation: true
+    initial_value: 0
+    type: float
+  feedback:
+    initial_value: null
+    mappings:
+    - type: from_llm
+    type: categorical
+    validation:
+      refill_utter: utter_refill_feedback
+      rejections:
+      - if: not ({'Yes' 'No'} contains slots.feedback)
+        utter: utter_invalid_yes_no
+    values:
+    - Yes
+    - No
+  first_name:
+    initial_value: null
+    mappings:
+    - entity: student
+      type: from_llm
+    shared_for_coexistence: true
+    type: text
+  language:
+    initial_value: en
+    is_builtin: true
+    mappings: []
+    type: strict_categorical
+    values:
+    - en
+  last_name:
+    initial_value: null
+    mappings:
+    - entity: student
+      type: from_llm
+    shared_for_coexistence: true
+    type: text
+  silence_timeout:
+    initial_value: 7.0
+    max_value: 1000000
+    type: float
+  student_question:
+    influence_conversation: true
+    initial_value: null
+    mappings:
+    - type: from_llm
+    type: text
+  ticket_decision:
+    influence_conversation: true
+    mappings:
+    - condition: slots.ticket_creation = "Yes"
+      type: from_llm
+    type: categorical
+    values:
+    - Yes
+    - No
+  ticket_details:
+    mappings:
+    - type: controlled
+    type: text
+  username:
+    influence_conversation: false
+    initial_value: null
+    mappings:
+    - allow_nlu_correction: true
+      type: from_llm
+    - entity: user
+      type: from_entity
+    shared_for_coexistence: true
+    type: text
+  visited:
+    influence_conversation: false
+    initial_value: false
+    mappings:
+    - type: from_llm
+    shared_for_coexistence: true
+    type: bool
+
+responses:
+  utter_ask_bscrim_new:
+  - buttons:
+    - payload: /SetSlots(bscrim_new=Yes)
+      title: 'Yes'
+    - payload: /SetSlots(bscrim_new=No)
+      title: 'No'
+    text: Are you enrolling in **BS Criminology** as a new student?
+  utter_ask_clarified_question:
+  - text: Can you please provide more details about your question?
+  utter_ask_confirm_slot_correction:
+  - buttons:
+    - payload: 'yes'
+      title: 'Yes'
+    - payload: 'no'
+      title: No, please keep the previous information
+    metadata:
+      rephrase: true
+      template: jinja
+    text: Do you want to update the {{ context.corrected_slots.keys()|join(', ') }}?
+  utter_ask_did_that_help:
+  - buttons:
+    - payload: 'Yes'
+      title: /SetSlots(did_that_help=Yes)
+    - payload: 'No'
+      title: /SetSlots(did_that_help=No)
+    metadata:
+      rephrase: true
+    text: Does this help you?
+  utter_ask_enrollee_type:
+  - condition: slots.enrollment_category = "requirements"
+    quick_replies:
+    - payload: /SetSlots(enrollee_type=Freshman)
+      title: Freshman
+    - payload: /SetSlots(enrollee_type=Transferee)
+      title: Transferee
+    - payload: /SetSlots(enrollee_type=Returning)
+      title: Returning
+    - payload: /SetSlots(enrollee_type=Continuing)
+      title: Continuing
+    text: Before we proceed, may I know what type of enrollee you are?
+  - condition: slots.enrollment_category = "procedure"
+    quick_replies:
+    - payload: /SetSlots(enrollee_type=Freshman)
+      title: Freshman
+    - payload: /SetSlots(enrollee_type=Transferee)
+      title: Transferee
+    - payload: /SetSlots(enrollee_type=Returning)
+      title: Returning
+    - payload: /SetSlots(enrollee_type=Continuing)
+      title: Continuing
+    text: The enrollment procedure differs depending on your type. What type of enrollee
+      are you?
+  utter_ask_enrollment_category:
+  - buttons:
+    - payload: /SetSlots(enrollment_category=procedure)
+      title: Procedure
+    - payload: /SetSlots(enrollment_category=requirements)
+      title: Requirements
+    - payload: /SetSlots(enrollment_category=schedule)
+      title: Schedule
+    text: Do you want to know about the enrollment **procedure**, the **requirements**,
+      or the **schedule**?
+  utter_ask_feedback:
+  - buttons:
+    - payload: /SetSlots(feedback=Yes)
+      title: 'Yes'
+    - payload: /SetSlots(feedback=No)
+      title: 'No'
+    text: Did that help answer your question?
+  utter_ask_rephrase:
+  - text: "I\u2019m sorry I am unable to understand you, could you please rephrase?"
+  utter_ask_still_there:
+  - metadata:
+      rephrase: true
+    text: Hello, are you still there?
+  utter_ask_student_question:
+  - text: What specific question do you have?
+  - text: How can I assist you today?
+  - condition: slots.student_question is not none
+    metadata:
+      rephrase: true
+    text: Do you have any other question regarding to campus?
+  utter_ask_ticket_decision:
+  - buttons:
+    - payload: /SetSlots(ticket_decision=Yes)
+      title: 'Yes'
+    - payload: /SetSlots(ticket_decision=No)
+      title: 'No'
+    text: Would you like to submit a support ticket for further assistance?
+  utter_ask_ticket_details:
+  - metadata:
+      rephrase: true
+    text: 'Please provide the full details of your issue:'
+  utter_ask_username:
+  - text: As my sangkay, I would love to know your name. What is your name?
+  utter_boolean_slot_rejection:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Sorry, the value you provided, `{{value}}`, is not valid. Please respond
+      with a valid value.
+  utter_can_do_something_else:
+  - metadata:
+      rephrase: true
+    text: What else can I help you with?
+  utter_cannot_handle:
+  - text: I'm sorry, I'm not trained to help with that.
+  utter_categorical_slot_rejection:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Sorry, you responded with an invalid value - `{{value}}`. Please select
+      one of the available options.
+  utter_clarification:
+  - text: Can you please provide more details about your question?
+  utter_clarification_options_rasa:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: 'I can help, but I need more information. Which of these would you like
+      to do: {{context.clarification_options}}?'
+  utter_corrected_previous_input:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Ok, I am updating {{ context.corrected_slots.keys()|join(', ') }} to {{
+      context.new_slot_values | join(', ') }} respectively.
+  utter_enrollment_procedure_continuing:
+  - text: 'Enrollment procedure for Continuing students:
+
+      1. Submit required documents
+
+      2. Fill out the application form
+
+      3. Pay the application fee
+
+      4. Wait for the admission decision
+
+      '
+  utter_enrollment_procedure_freshman:
+  - text: 'Enrollment procedure for Freshmen:
+
+      1. Submit required documents
+
+      2. Fill out the application form
+
+      3. Pay the application fee
+
+      4. Wait for the admission decision
+
+      '
+  utter_enrollment_procedure_returning:
+  - text: 'Enrollment procedure for Returning students:
+
+      1. Submit required documents
+
+      2. Fill out the application form
+
+      3. Pay the application fee
+
+      4. Wait for the admission decision
+
+      '
+  utter_enrollment_procedure_transferee:
+  - text: 'Enrollment procedure for Transferees:
+
+      1. Submit required documents
+
+      2. Fill out the application form
+
+      3. Pay the application fee
+
+      4. Wait for the admission decision
+
+      '
+  utter_enrollment_requirements_continuing:
+  - text: 'Requirements for Continuing Students:
+
+      1. Duly Signed Student Clearance
+
+      2. Admission Slip
+
+      3. Evaluation of Grades
+
+      4. Settlement of Back Accounts (if any)
+
+      '
+  utter_enrollment_requirements_freshmen:
+  - text: 'Requirements for {enrollee_type}:
+
+      1. SF 9 (SHS Card)
+
+      2. Good Moral Certificate
+
+      3. Photocopy of SHS Diploma
+
+      4. PSA Authenticated Birth Certificate
+
+      5. Two (2) pcs. 2x2 ID
+
+      6. Medical Certificate
+
+      7. One (1) Long Expanding Envelope
+
+      '
+  utter_enrollment_requirements_new_crim:
+  - text: 'Requirements for Freshmen in **BS Criminology**:
+
+      1. SF 9 (SHS Card)
+
+      2. Good Moral Certificate
+
+      3. Photocopy of SHS Diploma
+
+      4. PSA Authenticated Birth Certificate
+
+      5. Two (2) pcs. 2x2 ID (with white background, name tag)
+
+      6. Medical Certificate from Government Doctor
+
+      7. One (1) Long Expanding Envelope
+
+      8. Police Clearance
+
+      '
+  utter_enrollment_requirements_returning:
+  - text: 'Requirements for Returning Students:
+
+      1. Duly Signed Student Clearance
+
+      2. Admission Slip
+
+      3. Evaluation of Grades
+
+      4. Settlement of Back Accounts (if any)
+
+      '
+  utter_enrollment_requirements_transferee:
+  - text: 'Requirements for Transferees:
+
+      1. Honorable Dismissal / Certificate of Transfer
+
+      2. Good Moral Certificate
+
+      3. Transcript of Records
+
+      4. PSA Authenticated Birth Certificate
+
+      5. Police Clearance (for BS Crim)
+
+      6. Two (2) pcs. 2x2 ID
+
+      7. Medical Certificate from Government Doctor
+
+      8. One (1) Long Expanding Envelope
+
+      '
+  utter_enrollment_schedule:
+  - text: "\U0001F4C5 Enrollment schedule will be announced soon. Please check back\
+      \ later."
+  utter_error_message:
+  - text: Something went wrong. Please try again in a few minutes.
+  utter_float_slot_rejection:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Sorry, it seems the value you provided `{{value}}` is not a valid number.
+      Please provide a valid number in your response.
+  utter_flow_cancelled_rasa:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Okay, stopping {{ context.canceled_name }}.
+  utter_flow_continue_interrupted:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Let's continue with {{ context.previous_flow_name }}.
+  utter_free_chitchat_response:
+  - metadata:
+      rephrase: true
+      rephrase_prompt: 'You are an incredibly friendly assistant. Generate a short
+
+        response to the user''s comment in simple english.
+
+
+        User: {{current_input}}
+
+        Response:
+
+        '
+    text: Sorry, I'm not able to answer that right now.
+  utter_greet:
+  - condition: slots.username is not none
+    metadata:
+      rephrase: true
+    text: Hi {username}! How can I assist you today?
+  - condition: slots.username is None
+    metadata:
+      rephrase: true
+    text: Hi, I am Sangkay the official student support chatbot for Abuyog Community
+      College.
+  - condition: slots.visited is true
+    metadata:
+      rephrase: true
+    text: Welcome back, {username}! How can I assist you today?
+  utter_happy_response:
+  - metadata:
+      rephrase: true
+    text: I'm glad to hear that! If you have any more questions or need further assistance,
+      feel free to ask.
+  utter_human_handoff_not_available:
+  - metadata:
+      rephrase: true
+    text: I understand you want to be connected to a human agent, but that's something
+      I cannot help you with at the moment. Is there something else I can help you
+      with?
+  utter_inform_code_change:
+  - metadata:
+      rephrase: true
+    text: There has been an update to my code. I need to wrap up our running dialogue
+      and start from scratch.
+  utter_inform_hangup:
+  - metadata:
+      rephrase: true
+    text: It seems you are not there anymore. I will hang up shortly.
+  utter_internal_error_rasa:
+  - text: Sorry, I am having trouble with that. Please try again in a few minutes.
+  utter_invalid_enrollee_type:
+  - text: "That doesn\u2019t look like a valid enrollee type. Please choose **Freshman**,\
+      \ **Continuing**, **Returning**, or **Transferee**."
+  utter_invalid_enrollment_category:
+  - text: "That doesn\u2019t look like a valid option. Please choose **procedure**,\
+      \ **requirements**, or **schedule**."
+  utter_invalid_yes_no:
+  - text: I'm sorry, but that doesn't seem to be a valid option. Please choose either
+      **Yes** or **No**.
+  utter_no_human_assistance:
+  - metadata:
+      rephrase: true
+    text: Okay, if you need any further assistance, feel free to ask!
+  utter_no_knowledge_base:
+  - metadata:
+      rephrase: true
+    text: I am afraid, I don't know the answer. At this point, I don't have access
+      to a knowledge base.
+  utter_no_relevant_answer_found:
+  - metadata:
+      rephrase: true
+    text: "I\u2019m sorry, I can\u2019t help with that."
+  utter_no_ticket_created:
+  - metadata:
+      rephrase: true
+    text: No ticket was created.
+  utter_not_corrected_previous_input:
+  - metadata:
+      rephrase: true
+    text: Ok, I did not correct the previous input.
+  utter_refill_bscrim_new:
+  - buttons:
+    - payload: /SetSlots(bscrim_new=Yes)
+      title: 'Yes'
+    - payload: /SetSlots(bscrim_new=No)
+      title: 'No'
+    text: Are you enrolling in BS Criminology as a new student?
+  utter_refill_enrollee_type:
+  - quick_replies:
+    - payload: /SetSlots(enrollee_type=Freshman)
+      title: Freshman
+    - payload: /SetSlots(enrollee_type=Continuing)
+      title: Continuing
+    - payload: /SetSlots(enrollee_type=Returning)
+      title: Returning
+    - payload: /SetSlots(enrollee_type=Transferee)
+      title: Transferee
+    text: 'Please select your enrollee type:'
+  utter_refill_enrollment_category:
+  - buttons:
+    - payload: /SetSlots(enrollment_category=procedure)
+      title: Procedure
+    - payload: /SetSlots(enrollment_category=requirements)
+      title: Requirements
+    - payload: /SetSlots(enrollment_category=schedule)
+      title: Schedule
+    text: 'Please choose again: **procedure**, **requirements**, or **schedule**?'
+  utter_refill_feedback:
+  - buttons:
+    - payload: /SetSlots(feedback=Yes)
+      title: 'Yes'
+    - payload: /SetSlots(feedback=No)
+      title: 'No'
+    text: 'Please select: **Yes** or **No**'
+  utter_refill_ticket_decision:
+  - buttons:
+    - payload: /SetSlots(ticket_decision=Yes)
+      title: 'Yes'
+    - payload: /SetSlots(ticket_decision=No)
+      title: 'No'
+    text: 'Please select: **Yes** or **No**'
+  utter_restart_conversation:
+  - text: Too many errors occurred. Starting a new conversation for you...
+  utter_sad_response:
+  - text: I'm sorry to hear that. If you need further assistance, please let me know.
+  utter_skip_question_answer:
+  - metadata:
+      rephrase: true
+    text: I'm here to provide you with the best assistance, and in order to do so,
+      I kindly request that we complete this step together. Your input is essential
+      for a seamless experience!
+  utter_ticket_created:
+  - metadata:
+      rephrase: true
+    text: Your ticket has been created successfully!
+  utter_unknown_question:
+  - text: I'm sorry, but I didn't quite understand your question
+  utter_user_input_empty_error_rasa:
+  - text: I see an empty message. What can I assist you with?
+  utter_user_input_too_long_error_rasa:
+  - metadata:
+      template: jinja
+    text: I'm sorry, but your message is too long for me to process. Please keep your
+      message concise and within {% if context.info.max_characters %}{{context.info.max_characters}}
+      characters.{% else %}a reasonable length.{% endif %}
+
+session_config:
+  carry_over_slots_to_new_session: true
+  session_expiration_time: 60
+
+entities:
+- username
+- name
+
+intents:
+- inform_username
+- inquire_enrollment
+
+actions:
+- flow_pattern_validate_slot
+- flow_pattern_search
+- flow_enrollment_flow
+- flow_pattern_continue_interrupted
+- utter_happy_response
+- flow_greet_flow
+- flow_pattern_cannot_handle
+- action_reset_bscrim_new
+- flow_pattern_cancel_flow
+- increment_error_count
+- action_reset_ticket_decision
+- flow_pattern_skip_question
+- flow_pattern_code_change
+- flow_pattern_restart
+- utter_ask_enrollment_category
+- flow_enrollment_requirements_flow
+- flow_feedback_flow
+- utter_ask_student_question
+- action_reset_did_that_help
+- flow_pattern_clarification
+- create_ticket
+- flow_pattern_internal_error
+- flow_pattern_completed
+- utter_ask_did_that_help
+- flow_pattern_collect_information
+- flow_pattern_correction
+- flow_enrollment_procedure_flow
+- utter_enrollment_schedule
+- flow_ticket_flow
+- flow_pattern_chitchat
+- flow_pattern_user_silence
+- end_conversation
+- action_reset_enrollee_type
+- action_reset_enrollment_category
+- flow_pattern_human_handoff
+- flow_pattern_session_start
+- flow_pattern_repeat_bot_messages

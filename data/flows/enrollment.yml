@@ -1,0 +1,155 @@
+flows:
+  enrollment_flow:
+    description: Handles user queries about enrollment, enrollment procedures, enrollment requirements, and enrollment schedules, with options for further assistance.
+    nlu_trigger:
+      - intent: inquire_enrollment
+    steps:
+      - collect: enrollment_category
+        description: The specific area of enrollment the user wants to know about
+        next:
+          - if: slots.enrollment_category = "requirements"
+            then: requirements_step
+          - if: slots.enrollment_category = "procedure"
+            then: procedure_step
+          - if: slots.enrollment_category = "schedule"
+            then: schedule_step
+          - else: clarify_step
+      
+      - id: requirements_step
+        call: enrollment_requirements_flow
+        next: END
+
+      - id: procedure_step
+        call: enrollment_procedure_flow
+        next: END
+
+      - id: schedule_step
+        action: utter_enrollment_schedule
+        next: feedback_step
+
+      - id: clarify_step
+        collect: enrollment_category
+      
+      - id: feedback_step
+        call: feedback_flow
+        next: END
+
+  enrollment_requirements_flow:
+    description: This will handle the enrollment requirements inquiries
+    steps:
+      - collect: enrollee_type
+        next:
+          - if: slots.enrollee_type = "Freshman"
+            then: requirements_step
+          - if: slots.enrollee_type = "Continuing"
+            then: requirements_continuing
+          - if: slots.enrollee_type = "Transferee"
+            then: requirements_transferee
+          - if: slots.enrollee_type = "Returning"
+            then: requirements_returning
+          - else: ticket_offer_step
+
+      - id: requirements_step
+        collect: bscrim_new
+        next:
+          - if: slots.bscrim_new = "Yes"
+            then: requirement_crim
+          - else: requirement_freshmen
+      
+      - id: requirement_freshmen
+        action: utter_enrollment_requirements_freshmen
+        next: feedback_step
+
+      - id: requirements_continuing
+        action: utter_enrollment_requirements_continuing
+        next: feedback_step
+      
+      - id: requirements_returning
+        action: utter_enrollment_requirements_returning
+        next: feedback_step
+      
+      - id: requirements_transferee
+        action: utter_enrollment_requirements_transferee
+        next: feedback_step
+
+      - id: requirement_crim
+        action: utter_enrollment_requirements_new_crim
+        next: feedback_step
+      
+      - id: ticket_offer_step
+        call: ticket_flow
+      
+      - id: feedback_step
+        call: feedback_flow
+        next: END
+
+  enrollment_procedure_flow:
+    description: This will handle the enrollment procedure inquiries
+    steps:
+      - collect: enrollee_type
+        next:
+        - if: slots.enrollee_type = "Freshman"
+          then: enrollment_freshman
+        - if: slots.enrollee_type = "Transferee"
+          then: enrollment_transferee
+        - if: slots.enrollee_type = "Returning"
+          then: enrollment_returning
+        - if: slots.enrollee_type = "Continuing"
+          then: enrollment_continuing
+        - else: ticket_offer_step
+
+      - id: enrollment_freshman
+        action: utter_enrollment_procedure_freshman
+        next: feedback_step
+
+      - id: enrollment_transferee
+        action: utter_enrollment_procedure_transferee
+        next: feedback_step
+
+      - id: enrollment_returning
+        action: utter_enrollment_procedure_returning
+        next: feedback_step
+
+      - id: enrollment_continuing
+        action: utter_enrollment_procedure_continuing
+        next: feedback_step
+
+      - id: feedback_step
+        call: feedback_flow
+        next: END
+      
+      - id: ticket_offer_step
+        call: ticket_flow
+
+  feedback_flow:
+    description: This will handle feedback after providing information
+    steps:
+      - collect: feedback
+        next:
+          - if: slots.feedback = "Yes"
+            then: end_positive
+          - if: slots.feedback = "No"
+            then: ticket_offer_step
+          - else: END
+
+      - id: end_positive
+        action: utter_happy_response
+        next: END
+      
+      - id: ticket_offer_step
+        call: ticket_flow
+  
+  ticket_flow:
+    description: This will handle ticket ticket creation
+    steps:
+      - collect: ticket_decision
+        next:
+          - if: slots.ticket_decision = "Yes"
+            then: create_ticket_step
+          - if: slots.ticket_decision = "No"
+            then: END
+          - else: END
+
+      - id: create_ticket_step
+        action: create_ticket
+        next: END

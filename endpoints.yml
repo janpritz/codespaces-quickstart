@@ -1,0 +1,96 @@
+# This file contains the different endpoints your bot can use.
+
+# Server where the models are pulled from.
+# https://rasa.com/docs/rasa-pro/production/model-storage#fetching-models-from-a-server
+
+#models:
+#  url: http://my-server.com/models/default_core@latest
+#  wait_time_between_pulls:  10   # [optional](default: 100)
+
+# Server which runs your custom actions.
+# https://rasa.com/docs/rasa-pro/concepts/custom-actions
+
+action_endpoint:
+  actions_module: "actions"
+
+# Tracker store which is used to store the conversations.
+# By default the conversations are stored in memory.
+# https://rasa.com/docs/rasa-pro/production/tracker-stores
+
+# tracker_store:
+#    type: redis
+#    url: localhost
+#    port: 6379
+#    db: 0
+#    password: null
+#    use_ssl: false
+#    socket_timeout: 5
+
+#tracker_store:
+#    type: mongod
+#    url: <url to your mongo instance, e.g. mongodb://localhost:27017>
+#    db: <name of the db within your mongo instance, e.g. rasa>
+#    username: <username used for authentication>
+#    password: <password used for authentication>
+
+# Event broker which all conversation events should be streamed to.
+# https://rasa.com/docs/rasa-pro/production/event-brokers
+
+# event_broker:
+#   type: SQL
+#   url: 127.0.0.1
+#   port: 5432
+#   dialect: postgresql
+#   username: postgres
+#   password: sangkaychatbot
+#   db: rasaconversationsDB
+
+# tracker_store:
+#    type: SQL
+#    dialect: postgresql
+#    url: localhost:5432
+#    db: rasabotDB
+#    username: postgres
+#    password: sangkaychatbot
+
+# Allow rephrasing of responses using a Rasa-hosted model
+nlg:
+  type: rephrase
+  llm:
+    model_group: rasa_command_generation_model
+
+# vector_store:
+#   type: qdrant
+#   collection: rasa
+#   host: 0.0.0.0
+#   port: 6333
+#   content_payload_key: page_content
+#   metadata_payload_key: metadata
+
+model_groups:
+  - id: rasa_command_generation_model
+    models:
+      - provider: rasa
+        model: rasa/command-generator-llama-3.1-8b-instruct
+        # model: rasa/cmd_gen_codellama_13b_calm_demo
+        api_base: "https://tutorial-llm.rasa.ai"
+
+# tracker_store:
+#   type: sql
+#   dialect: postgresql
+#   url: 127.0.0.1
+#   port: 5432
+#   db: conversationsDB
+#   username: postgres
+#   password: sangkaychatbot
+
+# lock_store:
+#     type: redis
+#     url: localhost
+#     port: 6379
+#     db: 1
+
+# event_broker:
+#     type: kafka
+#     url: localhost
+#     port: 9092

@@ -1,0 +1,85 @@
+{
+  "intent": [
+    {
+      "data_type": "sentence",
+      "attribute": "intent",
+      "origin": "e2e_run_CountVectorsFeaturizer5",
+      "is_sparse": true,
+      "shape": [
+        0,
+        2
+      ],
+      "safetensors_key": "intent_0"
+    }
+  ],
+  "text": [
+    {
+      "data_type": "sequence",
+      "attribute": "text",
+      "origin": [
+        "e2e_run_LexicalSyntacticFeaturizer4",
+        "e2e_run_CountVectorsFeaturizer5",
+        "e2e_run_CountVectorsFeaturizer6"
+      ],
+      "is_sparse": true,
+      "shape": [
+        0,
+        223
+      ],
+      "safetensors_key": "text_0"
+    },
+    {
+      "data_type": "sentence",
+      "attribute": "text",
+      "origin": [
+        "e2e_run_CountVectorsFeaturizer5",
+        "e2e_run_CountVectorsFeaturizer6"
+      ],
+      "is_sparse": true,
+      "shape": [
+        0,
+        207
+      ],
+      "safetensors_key": "text_1"
+    }
+  ],
+  "entities": [
+    {
+      "data_type": "sentence",
+      "attribute": "entities",
+      "origin": "SingleStateFeaturizer",
+      "is_sparse": true,
+      "shape": [
+        0,
+        2
+      ],
+      "safetensors_key": "entities_0"
+    }
+  ],
+  "action_name": [
+    {
+      "data_type": "sentence",
+      "attribute": "action_name",
+      "origin": "e2e_run_CountVectorsFeaturizer5",
+      "is_sparse": true,
+      "shape": [
+        0,
+        30
+      ],
+      "safetensors_key": "action_name_0"
+    }
+  ],
+  "slots": [
+    {
+      "data_type": "sentence",
+      "attribute": "slots",
+      "origin": "SingleStateFeaturizer",
+      "is_sparse": true,
+      "shape": [
+        0,
+        34
+      ],
+      "safetensors_key": "slots_0"
+    }
+  ]
+}
