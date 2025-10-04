@@ -20,8 +20,8 @@ flows:
               - action: action_correct_flow_slot
               - action: utter_corrected_previous_input
                 next: END
-  pattern_chitchat:
-    description: handle interactions with the user that are not task-oriented
-    name: pattern chitchat
-    steps:
-      - action: utter_free_chitchat_response
+  # pattern_chitchat:
+  #   description: handle interactions with the user that are not task-oriented
+  #   name: pattern chitchat
+  #   steps:
+  #     - action: utter_free_chitchat_response

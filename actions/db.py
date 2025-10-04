@@ -1,11 +1,22 @@
-# db.py (create this as a helper file)
-import pymysql
+import os
+from dotenv import load_dotenv
+import mysql.connector
+from mysql.connector import Error
+
+# Load environment variables from .env file
+load_dotenv()
+
 
 def get_db_connection():
-    return pymysql.connect(
-        host="srv1631.hstgr.io",        # e.g. "srv123.hostinger.com"
-        username="u611944498_sangkaychatbot",
-        password="Sangkay2025",
-        database="u611944498_sangkayDB",
-        cursorclass=pymysql.cursors.DictCursor  # returns results as dicts
-    )
+    try:
+        conn = mysql.connector.connect(
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME")
+        )
+        if conn.is_connected():
+            return conn
+    except Error as e:
+        print(f"Error while connecting to database: {e}")
+        return None

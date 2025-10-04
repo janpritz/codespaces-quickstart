@@ -19,6 +19,8 @@ flows:
   
   ticket_flow:
     description: This will handle ticket ticket creation
+    nlu_trigger:
+    - intent: submit_ticket
     steps:
       - collect: ticket_decision
         next:

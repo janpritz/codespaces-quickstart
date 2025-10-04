@@ -24,6 +24,7 @@ intents:
 - require_bscrim_new
 - enroll_continuing
 - thanks
+- submit_ticket
 
 slots:
   language:
@@ -1236,3 +1237,9 @@ actions:
 - utter_enrollment_schedule
 - action_reset_enrollee_type
 - action_reset_enrollment_category
+- action_utter_vision
+- action_utter_mission
+- action_utter_mission_separate
+- action_utter_core_values
+- action_utter_goals
+- action_utter_acc_hymn

@@ -6,19 +6,19 @@ flows:
   mission_flow:
     description: Student asking for the ACC’s mission as printed in the student manual
     steps:
-      - action: utter_mission
+      - action: action_utter_mission
   mission_separate_flow:
     description: Student asking for the ACC’s mission with 'and' separated in response
     steps:
-      - action: utter_mission_separate
+      - action: action_utter_mission_separate
   core_values_flow:
     description: Student asking for the ACC’s core values as printed in the student manual
     steps:
-      - action: utter_core_values
+      - action: action_utter_core_values
   goals_flow:
     description: Student asking for the ACC’s goals as printed in the student manual
     steps:
-      - action: utter_goals
+      - action: action_utter_goals
   office_of_the_registrar_flow:
     description: The question asks for the Office of the Registrar responsibilities and how it coordinates student registration, transfer and graduation processes
     steps:
@@ -244,6 +244,6 @@ flows:
     steps:
       - action: utter_board_of_trustees
   acc_hymn_flow:
-    description: The asks for the ACC Hymn
+    description: The asks for the ACC Hymn lyrics
     steps:
-      - action: utter_acc_hymn
+      - action: action_utter_acc_hymn
