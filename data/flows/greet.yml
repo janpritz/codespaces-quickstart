@@ -1,17 +1,16 @@
 flows:
-  greet_flow:
-    description: Flow to greet user and collect their username
+  greet_user_flow:
+    description: Greets the user and asks how to assist them further.
+    nlu_trigger:
+      - intent: greet
     steps:
-      - id: greet
-        action: utter_greet
-        next: ask_username
-
-      - id: ask_username
-        description: Ask the user for their name
-        collect: username
-        next: set_visited
-      
-      - id: set_visited
-        set_slots:
-          - visited: true
+      - action: utter_greet
+      - action: utter_help_user
+  
+  inform_username:
+    description: This flow is triggered when the user provides their username.
+    nlu_trigger:
+      - intent: inform_username
+    steps:
+      - action: utter_greet
         next: END

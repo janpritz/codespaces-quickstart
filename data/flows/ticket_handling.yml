@@ -1,0 +1,32 @@
+flows:
+  feedback_flow:
+    description: This will handle feedback after providing information
+    steps:
+      - collect: feedback
+        next:
+          - if: slots.feedback = "Yes"
+            then: end_positive
+          - if: slots.feedback = "No"
+            then: ticket_offer_step
+          - else: END
+
+      - id: end_positive
+        action: utter_happy_response
+        next: END
+      
+      - id: ticket_offer_step
+        call: ticket_flow
+  
+  ticket_flow:
+    description: This will handle ticket ticket creation
+    steps:
+      - collect: ticket_decision
+        next:
+          - if: slots.ticket_decision = "Yes"
+            then: create_ticket_step
+          - if: slots.ticket_decision = "No"
+            then: END
+          - else: END
+
+      - id: create_ticket_step
+        action: create_ticket

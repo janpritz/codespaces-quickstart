@@ -1,6 +1,6 @@
 flows:
   enrollment_flow:
-    description: Handles user queries about enrollment, enrollment procedures, enrollment requirements, and enrollment schedules, with options for further assistance.
+    description: Handles user queries about enrollment, enrollment procedures, enrollment process, enrollment requirements, and enrollment schedules, in Abuyog Community College (ACC), with options for further assistance.
     nlu_trigger:
       - intent: inquire_enrollment
     steps:
@@ -35,7 +35,7 @@ flows:
         next: END
 
   enrollment_requirements_flow:
-    description: This will handle the enrollment requirements inquiries
+    description: This will handle the enrollment requirements, documents needed, or prerequisite for enrollment inquiries in Abuyog Community College (ACC)
     steps:
       - collect: enrollee_type
         next:
@@ -84,7 +84,7 @@ flows:
         next: END
 
   enrollment_procedure_flow:
-    description: This will handle the enrollment procedure inquiries
+    description: This will handle the enrollment procedure, enrollment processes inquiries in Abuyog Community College (ACC)
     steps:
       - collect: enrollee_type
         next:
@@ -113,43 +113,10 @@ flows:
       - id: enrollment_continuing
         action: utter_enrollment_procedure_continuing
         next: feedback_step
-
+      
       - id: feedback_step
         call: feedback_flow
         next: END
       
       - id: ticket_offer_step
         call: ticket_flow
-
-  feedback_flow:
-    description: This will handle feedback after providing information
-    steps:
-      - collect: feedback
-        next:
-          - if: slots.feedback = "Yes"
-            then: end_positive
-          - if: slots.feedback = "No"
-            then: ticket_offer_step
-          - else: END
-
-      - id: end_positive
-        action: utter_happy_response
-        next: END
-      
-      - id: ticket_offer_step
-        call: ticket_flow
-  
-  ticket_flow:
-    description: This will handle ticket ticket creation
-    steps:
-      - collect: ticket_decision
-        next:
-          - if: slots.ticket_decision = "Yes"
-            then: create_ticket_step
-          - if: slots.ticket_decision = "No"
-            then: END
-          - else: END
-
-      - id: create_ticket_step
-        action: create_ticket
-        next: END

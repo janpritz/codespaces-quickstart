@@ -16,14 +16,16 @@ class ActionCreateTicket(Action):
         # Get the sender ID from the messaging platform
         recipient_id = tracker.sender_id
 
+        #baseurl
+        base_url = "https://41fff35038ff.ngrok-free.app/tickets/create/"
+
         # Build the API URL with the recipient ID
-        api_url = f"http://localhost:8000/tickets/create/{recipient_id}"
+        api_url = f"{base_url}{recipient_id}"
 
-        # Send a clickable link to the user
+        # Assuming ticket creation was successful, send a success message
         dispatcher.utter_message(
-            text=f"Click here to create your ticket: [Create Ticket]({api_url})"
+            text=f"Click here to redirect to the link {api_url}."
         )
-
         return []
 
 

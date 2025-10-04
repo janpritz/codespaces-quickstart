@@ -1,0 +1,23 @@
+{
+  "0": "academic_advising_request",
+  "1": "course_registration_status",
+  "2": "enroll_continuing",
+  "3": "enroll_freshman",
+  "4": "enroll_returning",
+  "5": "enroll_transferee",
+  "6": "exam_schedule",
+  "7": "goodbye",
+  "8": "graduation_requirements",
+  "9": "greet",
+  "10": "inquire_enrollment",
+  "11": "inquire_enrollment_category",
+  "12": "payment_inquiries",
+  "13": "require_bscrim_new",
+  "14": "student_account_status",
+  "15": "student_login_issue",
+  "16": "student_records_request",
+  "17": "student_support_services",
+  "18": "submit_ticket",
+  "19": "thank",
+  "20": "transcript_request"
+}

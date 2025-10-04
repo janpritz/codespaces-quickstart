@@ -1,11 +1,54 @@
-version: "3.1"
+version: '3.1'
+intents:
+- help
+- enroll_returning
+- enrollment_procedure_freshmen
+- inform_username
+- inquire_enrollment
+- goodbye
+- student_support_services
+- payment_inquiries
+- student_account_status
+- exam_schedule
+- student_login_issue
+- course_registration_status
+- submit_ticket
+- student_records_request
+- transcript_request
+- greet
+- graduation_requirements
+- academic_advising_request
+- enroll_transferee
+- enroll_freshman
+- inquire_enrollment_category
+- require_bscrim_new
+- enroll_continuing
+- thanks
 
 slots:
+  language:
+    initial_value: en
+    is_builtin: true
+    mappings: []
+    type: strict_categorical
+    values:
+    - en
+  confirm_correction:
+    mappings:
+    - type: from_llm
+    type: bool
+  silence_timeout:
+    initial_value: 7.0
+    max_value: 1000000
+    type: float
+  consecutive_silence_timeouts:
+    initial_value: 0.0
+    max_value: 1000000
+    type: float
   bscrim_new:
     influence_conversation: true
     mappings:
-    - condition: slots.enrollee_type = "Freshman" and slots.enrollment_category =
-        "requirements"
+    - condition: slots.enrollee_type = "Freshman" and slots.enrollment_category = "requirements"
       type: from_llm
     type: categorical
     values:
@@ -17,16 +60,8 @@ slots:
     mappings:
     - type: from_llm
     type: text
-  confirm_correction:
-    mappings:
-    - type: from_llm
-    type: bool
   confirm_slot_correction:
     type: bool
-  consecutive_silence_timeouts:
-    initial_value: 0.0
-    max_value: 1000000
-    type: float
   enrollee_type:
     influence_conversation: true
     mappings:
@@ -80,13 +115,6 @@ slots:
       type: from_llm
     shared_for_coexistence: true
     type: text
-  language:
-    initial_value: en
-    is_builtin: true
-    mappings: []
-    type: strict_categorical
-    values:
-    - en
   last_name:
     initial_value: null
     mappings:
@@ -94,10 +122,6 @@ slots:
       type: from_llm
     shared_for_coexistence: true
     type: text
-  silence_timeout:
-    initial_value: 7.0
-    max_value: 1000000
-    type: float
   student_question:
     influence_conversation: true
     initial_value: null
@@ -134,22 +158,116 @@ slots:
     - type: from_llm
     shared_for_coexistence: true
     type: bool
-
 responses:
+  utter_default:
+  - text: I’m sorry I am unable to understand you, could you please rephrase?
+  utter_goodbye:
+  - metadata:
+      rephrase: true
+    text: Goodbye! If you have any more questions, feel free to ask.
+  utter_ask_rephrase:
+  - text: I’m sorry I am unable to understand you, could you please rephrase?
+  utter_ask_still_there:
+  - metadata:
+      rephrase: true
+    text: Hello, are you still there?
+  utter_boolean_slot_rejection:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Sorry, the value you provided, `{{value}}`, is not valid. Please respond with a valid value.
+  utter_can_do_something_else:
+  - metadata:
+      rephrase: true
+    text: What else can I help you with?
+  utter_cannot_handle:
+  - text: I'm sorry, I'm not trained to help with that.
+  utter_categorical_slot_rejection:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Sorry, you responded with an invalid value - `{{value}}`. Please select one of the available options.
+  utter_clarification_options_rasa:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: 'I can help, but I need more information. Which of these would you like to do: {{context.clarification_options}}?'
+  utter_corrected_previous_input:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Ok, I am updating {{ context.corrected_slots.keys()|join(', ') }} to {{ context.new_slot_values | join(', ') }} respectively.
+  utter_float_slot_rejection:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Sorry, it seems the value you provided `{{value}}` is not a valid number. Please provide a valid number in your response.
+  utter_flow_cancelled_rasa:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Okay, stopping {{ context.canceled_name }}.
+  utter_flow_continue_interrupted:
+  - metadata:
+      rephrase: true
+      template: jinja
+    text: Let's continue with {{ context.previous_flow_name }}.
+  utter_free_chitchat_response:
+  - metadata:
+      rephrase: true
+      rephrase_prompt: |
+        You are an incredibly friendly assistant. Generate a short
+        response to the user's comment in simple english.
+
+        User: {{current_input}}
+        Response:
+    text: Sorry, I'm not able to answer that right now.
+  utter_human_handoff_not_available:
+  - metadata:
+      rephrase: true
+    text: I understand you want to be connected to a human agent, but that's something I cannot help you with at the moment. Is there something else I can help you with?
+  utter_inform_code_change:
+  - metadata:
+      rephrase: true
+    text: There has been an update to my code. I need to wrap up our running dialogue and start from scratch.
+  utter_inform_hangup:
+  - metadata:
+      rephrase: true
+    text: It seems you are not there anymore. I will hang up shortly.
+  utter_internal_error_rasa:
+  - text: Sorry, I am having trouble with that. Please try again in a few minutes.
+  utter_no_knowledge_base:
+  - metadata:
+      rephrase: true
+    text: I am afraid, I don't know the answer. At this point, I don't have access to a knowledge base.
+  utter_no_relevant_answer_found:
+  - metadata:
+      rephrase: true
+    text: I’m sorry, I can’t help with that.
+  utter_skip_question_answer:
+  - metadata:
+      rephrase: true
+    text: I'm here to provide you with the best assistance, and in order to do so, I kindly request that we complete this step together. Your input is essential for a seamless experience!
+  utter_user_input_empty_error_rasa:
+  - text: I see an empty message. What can I assist you with?
+  utter_user_input_too_long_error_rasa:
+  - metadata:
+      template: jinja
+    text: I'm sorry, but your message is too long for me to process. Please keep your message concise and within {% if context.info.max_characters %}{{context.info.max_characters}} characters.{% else %}a reasonable length.{% endif %}
   utter_ask_bscrim_new:
   - buttons:
     - payload: /SetSlots(bscrim_new=Yes)
-      title: 'Yes'
+      title: Yes
     - payload: /SetSlots(bscrim_new=No)
-      title: 'No'
+      title: No
     text: Are you enrolling in **BS Criminology** as a new student?
   utter_ask_clarified_question:
   - text: Can you please provide more details about your question?
   utter_ask_confirm_slot_correction:
   - buttons:
-    - payload: 'yes'
-      title: 'Yes'
-    - payload: 'no'
+    - payload: yes
+      title: Yes
+    - payload: no
       title: No, please keep the previous information
     metadata:
       rephrase: true
@@ -157,9 +275,9 @@ responses:
     text: Do you want to update the {{ context.corrected_slots.keys()|join(', ') }}?
   utter_ask_did_that_help:
   - buttons:
-    - payload: 'Yes'
+    - payload: Yes
       title: /SetSlots(did_that_help=Yes)
-    - payload: 'No'
+    - payload: No
       title: /SetSlots(did_that_help=No)
     metadata:
       rephrase: true
@@ -186,8 +304,7 @@ responses:
       title: Returning
     - payload: /SetSlots(enrollee_type=Continuing)
       title: Continuing
-    text: The enrollment procedure differs depending on your type. What type of enrollee
-      are you?
+    text: The enrollment procedure differs depending on your type. What type of enrollee are you?
   utter_ask_enrollment_category:
   - buttons:
     - payload: /SetSlots(enrollment_category=procedure)
@@ -196,21 +313,18 @@ responses:
       title: Requirements
     - payload: /SetSlots(enrollment_category=schedule)
       title: Schedule
-    text: Do you want to know about the enrollment **procedure**, the **requirements**,
-      or the **schedule**?
+    text: Do you want to know about the enrollment **procedure**, the **requirements**, or the **schedule**?
   utter_ask_feedback:
   - buttons:
     - payload: /SetSlots(feedback=Yes)
-      title: 'Yes'
+      title: Yes
     - payload: /SetSlots(feedback=No)
-      title: 'No'
+      title: No
     text: Did that help answer your question?
-  utter_ask_rephrase:
-  - text: "I\u2019m sorry I am unable to understand you, could you please rephrase?"
-  utter_ask_still_there:
-  - metadata:
+  utter_ask_how_to_help:
+  - text: How can I assist you today?
+    metadata:
       rephrase: true
-    text: Hello, are you still there?
   utter_ask_student_question:
   - text: What specific question do you have?
   - text: How can I assist you today?
@@ -221,9 +335,9 @@ responses:
   utter_ask_ticket_decision:
   - buttons:
     - payload: /SetSlots(ticket_decision=Yes)
-      title: 'Yes'
+      title: Yes
     - payload: /SetSlots(ticket_decision=No)
-      title: 'No'
+      title: No
     text: Would you like to submit a support ticket for further assistance?
   utter_ask_ticket_details:
   - metadata:
@@ -231,261 +345,138 @@ responses:
     text: 'Please provide the full details of your issue:'
   utter_ask_username:
   - text: As my sangkay, I would love to know your name. What is your name?
-  utter_boolean_slot_rejection:
-  - metadata:
-      rephrase: true
-      template: jinja
-    text: Sorry, the value you provided, `{{value}}`, is not valid. Please respond
-      with a valid value.
-  utter_can_do_something_else:
-  - metadata:
-      rephrase: true
-    text: What else can I help you with?
-  utter_cannot_handle:
-  - text: I'm sorry, I'm not trained to help with that.
-  utter_categorical_slot_rejection:
-  - metadata:
-      rephrase: true
-      template: jinja
-    text: Sorry, you responded with an invalid value - `{{value}}`. Please select
-      one of the available options.
   utter_clarification:
   - text: Can you please provide more details about your question?
-  utter_clarification_options_rasa:
-  - metadata:
-      rephrase: true
-      template: jinja
-    text: 'I can help, but I need more information. Which of these would you like
-      to do: {{context.clarification_options}}?'
-  utter_corrected_previous_input:
-  - metadata:
-      rephrase: true
-      template: jinja
-    text: Ok, I am updating {{ context.corrected_slots.keys()|join(', ') }} to {{
-      context.new_slot_values | join(', ') }} respectively.
   utter_enrollment_procedure_continuing:
-  - text: 'Enrollment procedure for Continuing students:
-
+  - text: |
+      Enrollment procedure for Continuing students:
       1. Submit required documents
-
       2. Fill out the application form
-
       3. Pay the application fee
-
       4. Wait for the admission decision
-
-      '
   utter_enrollment_procedure_freshman:
-  - text: 'Enrollment procedure for Freshmen:
-
+  - text: |
+      Enrollment procedure for Freshmen:
       1. Submit required documents
-
       2. Fill out the application form
-
       3. Pay the application fee
-
       4. Wait for the admission decision
-
-      '
   utter_enrollment_procedure_returning:
-  - text: 'Enrollment procedure for Returning students:
-
+  - text: |
+      Enrollment procedure for Returning students:
       1. Submit required documents
-
       2. Fill out the application form
-
       3. Pay the application fee
-
       4. Wait for the admission decision
-
-      '
   utter_enrollment_procedure_transferee:
-  - text: 'Enrollment procedure for Transferees:
-
+  - text: |
+      Enrollment procedure for Transferees:
       1. Submit required documents
-
       2. Fill out the application form
-
       3. Pay the application fee
-
       4. Wait for the admission decision
-
-      '
   utter_enrollment_requirements_continuing:
-  - text: 'Requirements for Continuing Students:
-
+  - text: |
+      Requirements for Continuing Students:
       1. Duly Signed Student Clearance
-
       2. Admission Slip
-
       3. Evaluation of Grades
-
       4. Settlement of Back Accounts (if any)
-
-      '
   utter_enrollment_requirements_freshmen:
-  - text: 'Requirements for {enrollee_type}:
-
+  - text: |
+      Requirements for {enrollee_type}:
       1. SF 9 (SHS Card)
-
       2. Good Moral Certificate
-
       3. Photocopy of SHS Diploma
-
       4. PSA Authenticated Birth Certificate
-
       5. Two (2) pcs. 2x2 ID
-
       6. Medical Certificate
-
       7. One (1) Long Expanding Envelope
-
-      '
   utter_enrollment_requirements_new_crim:
-  - text: 'Requirements for Freshmen in **BS Criminology**:
-
+  - text: |
+      Requirements for Freshmen in **BS Criminology**:
       1. SF 9 (SHS Card)
-
       2. Good Moral Certificate
-
       3. Photocopy of SHS Diploma
-
       4. PSA Authenticated Birth Certificate
-
       5. Two (2) pcs. 2x2 ID (with white background, name tag)
-
       6. Medical Certificate from Government Doctor
-
       7. One (1) Long Expanding Envelope
-
       8. Police Clearance
-
-      '
   utter_enrollment_requirements_returning:
-  - text: 'Requirements for Returning Students:
-
+  - text: |
+      Requirements for Returning Students:
       1. Duly Signed Student Clearance
-
       2. Admission Slip
-
       3. Evaluation of Grades
-
       4. Settlement of Back Accounts (if any)
-
-      '
   utter_enrollment_requirements_transferee:
-  - text: 'Requirements for Transferees:
-
+  - text: |
+      Requirements for Transferees:
       1. Honorable Dismissal / Certificate of Transfer
-
       2. Good Moral Certificate
-
       3. Transcript of Records
-
       4. PSA Authenticated Birth Certificate
-
       5. Police Clearance (for BS Crim)
-
       6. Two (2) pcs. 2x2 ID
-
       7. Medical Certificate from Government Doctor
-
       8. One (1) Long Expanding Envelope
-
-      '
+  utter_help_user:
+  - text: If you are having trouble with the chatbot, you can type "help" to see a list of things I can assist you with.
+  utter_help:
+  - text: |
+      Sangkay Chatbot can assist you with the following:
+      - Enrollment procedures and requirements
+      - Student support services
+      - Payment inquiries
+      - Student account status
+      - Exam schedules
+      - Student login issues
+      - Course registration status
+      - Submitting support tickets
+      - Student records requests
+      - Transcript requests
+      - Graduation requirements
+      - Academic advising requests
+  utter_suggest_create_ticket:
+  - metadata:
+      rephrase: true
+    text: If you need further assistance, type "submit ticket" to create a support ticket.
   utter_enrollment_schedule:
-  - text: "\U0001F4C5 Enrollment schedule will be announced soon. Please check back\
-      \ later."
+  - text: 📅 Enrollment schedule will be announced soon. Please check back later.
   utter_error_message:
   - text: Something went wrong. Please try again in a few minutes.
-  utter_float_slot_rejection:
-  - metadata:
-      rephrase: true
-      template: jinja
-    text: Sorry, it seems the value you provided `{{value}}` is not a valid number.
-      Please provide a valid number in your response.
-  utter_flow_cancelled_rasa:
-  - metadata:
-      rephrase: true
-      template: jinja
-    text: Okay, stopping {{ context.canceled_name }}.
-  utter_flow_continue_interrupted:
-  - metadata:
-      rephrase: true
-      template: jinja
-    text: Let's continue with {{ context.previous_flow_name }}.
-  utter_free_chitchat_response:
-  - metadata:
-      rephrase: true
-      rephrase_prompt: 'You are an incredibly friendly assistant. Generate a short
-
-        response to the user''s comment in simple english.
-
-
-        User: {{current_input}}
-
-        Response:
-
-        '
-    text: Sorry, I'm not able to answer that right now.
   utter_greet:
   - condition: slots.username is not none
     metadata:
       rephrase: true
-    text: Hi {username}! How can I assist you today?
+    text: Hi {username}! I am Sangkay the official student support chatbot for Abuyog Community College.
   - condition: slots.username is None
     metadata:
       rephrase: true
-    text: Hi, I am Sangkay the official student support chatbot for Abuyog Community
-      College.
+    text: Hi, I am Sangkay the official student support chatbot for Abuyog Community College.
   - condition: slots.visited is true
     metadata:
       rephrase: true
     text: Welcome back, {username}! How can I assist you today?
+  utter_you_are_welcome:
+  - metadata:
+      rephrase: true
+    text: You're welcome! If you have any more questions, feel free to ask.
   utter_happy_response:
   - metadata:
       rephrase: true
-    text: I'm glad to hear that! If you have any more questions or need further assistance,
-      feel free to ask.
-  utter_human_handoff_not_available:
-  - metadata:
-      rephrase: true
-    text: I understand you want to be connected to a human agent, but that's something
-      I cannot help you with at the moment. Is there something else I can help you
-      with?
-  utter_inform_code_change:
-  - metadata:
-      rephrase: true
-    text: There has been an update to my code. I need to wrap up our running dialogue
-      and start from scratch.
-  utter_inform_hangup:
-  - metadata:
-      rephrase: true
-    text: It seems you are not there anymore. I will hang up shortly.
-  utter_internal_error_rasa:
-  - text: Sorry, I am having trouble with that. Please try again in a few minutes.
+    text: I'm glad to hear that! If you have any more questions or need further assistance, feel free to ask.
   utter_invalid_enrollee_type:
-  - text: "That doesn\u2019t look like a valid enrollee type. Please choose **Freshman**,\
-      \ **Continuing**, **Returning**, or **Transferee**."
+  - text: That doesn’t look like a valid enrollee type. Please choose **Freshman**, **Continuing**, **Returning**, or **Transferee**.
   utter_invalid_enrollment_category:
-  - text: "That doesn\u2019t look like a valid option. Please choose **procedure**,\
-      \ **requirements**, or **schedule**."
+  - text: That doesn’t look like a valid option. Please choose **procedure**, **requirements**, or **schedule**.
   utter_invalid_yes_no:
-  - text: I'm sorry, but that doesn't seem to be a valid option. Please choose either
-      **Yes** or **No**.
+  - text: I'm sorry, but that doesn't seem to be a valid option. Please choose either **Yes** or **No**.
   utter_no_human_assistance:
   - metadata:
       rephrase: true
     text: Okay, if you need any further assistance, feel free to ask!
-  utter_no_knowledge_base:
-  - metadata:
-      rephrase: true
-    text: I am afraid, I don't know the answer. At this point, I don't have access
-      to a knowledge base.
-  utter_no_relevant_answer_found:
-  - metadata:
-      rephrase: true
-    text: "I\u2019m sorry, I can\u2019t help with that."
   utter_no_ticket_created:
   - metadata:
       rephrase: true
@@ -497,9 +488,9 @@ responses:
   utter_refill_bscrim_new:
   - buttons:
     - payload: /SetSlots(bscrim_new=Yes)
-      title: 'Yes'
+      title: Yes
     - payload: /SetSlots(bscrim_new=No)
-      title: 'No'
+      title: No
     text: Are you enrolling in BS Criminology as a new student?
   utter_refill_enrollee_type:
   - quick_replies:
@@ -524,89 +515,724 @@ responses:
   utter_refill_feedback:
   - buttons:
     - payload: /SetSlots(feedback=Yes)
-      title: 'Yes'
+      title: Yes
     - payload: /SetSlots(feedback=No)
-      title: 'No'
+      title: No
     text: 'Please select: **Yes** or **No**'
   utter_refill_ticket_decision:
   - buttons:
     - payload: /SetSlots(ticket_decision=Yes)
-      title: 'Yes'
+      title: Yes
     - payload: /SetSlots(ticket_decision=No)
-      title: 'No'
+      title: No
     text: 'Please select: **Yes** or **No**'
   utter_restart_conversation:
   - text: Too many errors occurred. Starting a new conversation for you...
   utter_sad_response:
   - text: I'm sorry to hear that. If you need further assistance, please let me know.
-  utter_skip_question_answer:
-  - metadata:
-      rephrase: true
-    text: I'm here to provide you with the best assistance, and in order to do so,
-      I kindly request that we complete this step together. Your input is essential
-      for a seamless experience!
   utter_ticket_created:
   - metadata:
       rephrase: true
     text: Your ticket has been created successfully!
   utter_unknown_question:
   - text: I'm sorry, but I didn't quite understand your question
-  utter_user_input_empty_error_rasa:
-  - text: I see an empty message. What can I assist you with?
-  utter_user_input_too_long_error_rasa:
-  - metadata:
-      template: jinja
-    text: I'm sorry, but your message is too long for me to process. Please keep your
-      message concise and within {% if context.info.max_characters %}{{context.info.max_characters}}
-      characters.{% else %}a reasonable length.{% endif %}
 
+# this is the faqs from student handbook
+  utter_office_of_the_registrar:
+    - text: |
+        The Office of the Registrar coordinates and controls activities involving student registration, transfer, and graduation. The Office is primarily responsible for the updating and safekeeping of student records with strict confidentiality. The Office is also responsible for the enforcement of the rules and regulations of the Commission on Higher Education, TESDA and Department of Education regarding admission and transfer, accreditation of subjects and units, curricular load, sequence of subjects, etc. Inquiries concerning admission, curricular offerings and similar information are routinely referred to and handled by the Admission Section.
+        
+        The Office of the Registrar coordinates with the Dean, Department Heads, and other administrative officers of the school regarding academic records, revisions of curricular programs, and offering of new courses. Students who want to verify their academic records should see the Section concerned. For cases not normally handled by the Sections, students are encouraged to see the School Registrar for proper guidance and advice.
+        
+        In order to carry out its mandated functions effectively, the Office of the Registrar is composed of four distinct sections: Admission Section, Records Section, Evaluation Section, and Management Information Section.
+  utter_admission_freshmen:
+    - text: |
+        Admission to Abuyog Community College is open to all regardless of sex, religious belief or political affiliation.
+        
+        Entrance Credentials
+        1. For incoming freshmen
+        · Form 138 / Report Card / Certificate of Ratings for ALS Passers
+        · Certificate of Good Moral Character
+        · College Admission Test
+        · Birth Certificate / NSO Authenticated Live Birth
+        · Additional Requirements per program
+        BS Criminology - Police Clearance, Medical Certificate
+        BS HRM - Medical Certificate
+        · Special Requirements for special cases
+  utter_admission_transferees:
+    - text: |
+        2. For transferees
+        · Honorable Dismissal (Transfer Credential) from the school last attended
+        · Transcript of Records
+        · Certificate of Good Moral Character from the school last attended
+        · Other requirements specified by the course
+        · Special Requirements for special cases
+  utter_admission_returning:
+    - text: |
+        3. For returning students
+        · Duly signed Student Clearance
+        · Recent Grades Evaluation
+        · Index of Payment (Photocopy)
+  utter_bonafide_students:
+    - text: |
+        Bonafide Students
+        Considered a bonafide student of the school is one who is duly enrolled; that is, who has submitted his appropriate admission or transfer credentials, made an initial payment of his tuition and other fees to the institution and was allowed to attend classes by the institution (CHED MORPHE 2008).
+  utter_procedure_for_enrolment:
+    - text: |
+        Procedure For Enrolment
+        a. Present entrance credentials
+        b. Pay entrance fee and ask for registration form
+        c. Fill out enrolment/registration form then have it approved by the College Registrar
+  utter_withdrawal_of_enrolment:
+    - text: |
+        Withdrawal of Enrolment - In case a student withdraws his/her enrolment before classes start, only 70% of the entrance fee will be refunded. But if he/she withdraws after classes have started, no fees are refunded and he/she is considered officially dropped from the roll after submitting a duly accomplished dropping form. If the student decides to drop his/her course after the Prelims, all fees are to be paid.
+  utter_acc_seal:
+    - text: |
+        Abuyog Community College is acting only on the acquisition of quality Education on knowledge but also trained the students to acquire the necessary information on knowledge and skills, especially on computers or modern technology, so that they will become more competitive in the outside world, the college is soaring up to modern world.
+        
+        Laurel: (Green in color) signifies triumph against ignorance hence wisdom reigns.
+        
+        Torch, scrolls and feather signifies wisdom, Torch with ACC flames signifies lights, scrolls signify books, papers used in achieving knowledge and feather signifies pencil for writing.
+        
+        Bee’s for Abuyog and 1979 the year the college was established.
+  utter_records_section:
+    - text: |
+        The Records Section issues transfer credentials, transcript of records, certifications on academic documents needed for employment, travel abroad, scholarship grants, board examination, etc. It also handles application for completion of incomplete grades as well as verification of academic status of students and graduates. All student records are constantly updated and maintained in utmost confidentiality at the Records Section. Enrolment data and other related statistics may be requested from this Section in connection with student research and other academic activities.
+  utter_evaluation_section:
+    - text: |
+        Evaluation of student academic records to determine credits earned for purposes of graduation is conducted by the Evaluation Section. The section sees to it that CHED rules and regulations, as well as school policies, regarding sequence of subjects, course content, semestral load, residence requirements, cross-enrolment, etc. are enforced and properly complied with. The Evaluation Section calendars the schedule for evaluation and application for graduation every term, and such schedules are always posted on the bulletin boards. Students are advised to apply for evaluation of their academic records at least one (1) semester/summer term before their expected graduation.
+  utter_management_information_section:
+    - text: |
+        Management Information Section, through its computer facilities, processes the academic records of students based on their validated certificate of enrolment until the final data output on final grades and other similar data.
+        
+        The Management Information Section likewise processes CHED required reports on student’s enrolment, grades, and units earned and reports required by other regulatory bodies. In sum, the MIS processes student’s records for various offices of the school, the CHED, parents and other offices or agencies which may require them.
+  utter_office_of_student_affairs:
+    - text: |
+        The Office of the Student affairs helps the school in achieving one of its main educational objectives- that of forming the person into a whole, useful, development-oriented, patriotic, and peace-loving individual. It serves as link between the administration and the student body as well as provides guidance on matters concerning student life, activities and discipline. The OSA also assists in the placement of graduates.
+        
+        Goals:
+        1. Promote the general welfare of the students.
+        2. Provide avenues to develop the potential and capacity of the students for future responsibility and leadership.
+        3. Trains students to become effective and productive components of the school and community; and
+        4. Ensure the fullest moral, physical, intellectual and social development of students by creating opportunities and activities for their participation.
+        
+        Services Offered:
+        1. Admission services
+        a. Conduct information drive for recruitment of students
+        b. Administer entrance examination for incoming freshman
+        c. Screen incoming students based on admission requirements and policies.
+        2. Student Welfare and Development Services
+  utter_guidance_and_counseling:
+    - text: |
+        College life entails a lot of difficult adjustments for students, however, it can be made easy at ACC through its guidance and counseling services where a Guidance Counselor is available to serve them and attend to their personal, social, financial and academic needs.
+        
+        1. Testing
+        This service is intended to measure student’s ability, achievement and/or other characteristics that may be useful bases for students in making decisions in areas of admission/readmission, choice of course, job placement, etc.
+        
+        2. Information
+        The Guidance Service is also designed to assist students in coping with adjustment problems caused by transition periods in various levels through:
+        • General/Block orientation Program
+        • Career Guidance Seminar
+        • Leadership Trainings
+        • Job Seeking Seminar
+        • Other Student Development Programs
+  utter_school_infirmary:
+    - text: |
+        The ACC infirmary provides medical and dental services to the ACC populace. It is manned by medical officers; school physician, registered nurse, and dentist.
+        
+        a. Services Rendered
+        Medical Services
+        Clinic hours:  Monday- Friday
+                            8am-12nn and 1pm-5pm
+        Dental Consultation  Every Tuesday and Thursday
+        Dental Procedure is by appointment
+        
+        The following services are provided by the school infirmary:
+        a. Medical examination of students and make referrals for those who need higher level of health care facilities.
+        b. Medical health services for common presenting health and medical problems and chronic illnesses which require special care and immediate attention during school days and includes minor injuries.
+        c. Administration of medication as warranted in accordance to the policy of the clinic in administration of medication.
+        d. Immunization to prevent communicable diseases in coordination with concerned government agencies.
+        e. Conduct one-on-one health counselling to individual students and assist students in dealing with critical health issues that concerns adolescents and young adults.
+        f. Conduct supplemental classroom instruction and materials on various health related topics. Facilitate trainings and workshops on specific topics that affect health and safety of students.
+  utter_dental_services:
+    - text: |
+        1. Dental examination and provision of oral prophylaxis
+        2. Dental consultation and treatment
+        3. Dental counseling
+        
+        c. Student Privilege
+        Free dental consultation, medical examination and initial dose of available oral medicines in accordance to the school policy in administration of medicines.
+  utter_other_services:
+    - text: |
+        Support for Pregnant Student
+        Upon identification of the student being pregnant, referral to the school nurse for proper assessment must be made. The said student can receive support services such as referral, exemption on physical activities. Referral to the guidance counsellor must be made thereafter for counselling and guidance.
+        
+        Support for Persons with Disability
+        Disability is as defined as a physical or mental condition that limits a person’s movements, senses, or activities. This institution recognizes the same and provides privileges as deem fit to the identified disabled person. Ramps are provided within the campus for the convenience of handicapped students.
+  utter_student_retention_policy:
+    - text: |
+        Pursuant to Resolution No. 177 s. 2016 A Resolution Approving the Admission and Retention policy of Abuyog Community College (Appendix D), the college shall adapt a General Weighted Average of 2.2 as cut-off grade for all board courses specifically on Criminology and Teacher Education.
+        
+        Gifted or honor students may be permitted to take such additional advanced subjects or overload, including the summer session, as the appropriate school official may determine, based upon the previous academic performance of the student and other evidence of educational measurement.
+  utter_student_absences:
+    - text: |
+        A student who incurs absences of more than twenty (20%) percent of the prescribed number of class or laboratory periods during the school year or term shall fail and earn no credit for the course or subject except in the instances as follows:
+        (1) When the institution adopts a different attendance policy for students who belong in the upper half of their classes; and
+        (2) When the institution exempts a student for just and reasonable ground, provided however, that the student is not excused from keeping–up with lessons, assignments and examinations. A faculty member may exempt a student who incurs absences beyond the twenty percent (20%) limit, but with the approval of proper school authority.
+  utter_credit:
+  - text: |
+        Credit and Units
+        One Collegiate unit of credit is one hour lecture/recitation each week for a total of 18 weeks in a semester. One unit of laboratory is equivalent to two-hour laboratory or shop work.
+  utter_grading_system:
+    - text: | 
+        Grading System
+        Abuyog Community College uses number grades from 1 to 5 in which 1.0 is the highest and 5.0 is the lowest. Below is the percent equivalent of each numerical value:
+        GRADE EQUIVALENT
+        1.0    -       99-100
+        1.1    -       97-98
+        1.2    -       95-96
+        1.3    -       93-94
+        1.4    -       91-92
+        1.5    -         90
+        1.6    -         89
+        1.7    -         88
+        1.8    -         87
+        1.9    -         86
+        2.0    -         85
+        2.1    -        84
+        2.2    -        83
+        2.3    -        82
+        2.4    -        81
+        2.5    -        80
+        2.6    -        79
+        2.7    -        78
+        2.8    -        77
+        2.9    -        76
+        3.0    -        75
+        3.1 - 4.0 -       66-74 (conditional failure)
+        4.1-5.0    -  0-65 (Failed)
+        
+        1. INC. – is a mark given to a student who lacks requirements/examinations.
+        2. DROPPED - mark given to a student who officially withdraws from the subject and/or has incurred absences beyond 20% of the total number of regular classes.
+        3. An incomplete (INC) may be removed upon satisfactory compliance of the lacking requirements and/or passing the examination arranged by the teacher and the student.
+        4. An incomplete not removed within one (1) semester automatically becomes a 5.0 or lapsed.
+        5. Students who failed to take examinations on regular schedules may be given special examinations on schedules agreed upon by the teacher and the student.
+        6. The teacher shall personally submit to the Registrar’s Office the completed grade. If the teacher cannot personally submit the grade, the submission must be done by a duly authorized person.
+        - No rating less than 2.5(80%) in any subject
+  utter_graduation:
+    - text: |
+        Application for Graduation
+        Candidates for graduation are required to apply for evaluation of their records during the semester preceding their graduation.
+        a. After evaluation of his/her records, he/she may file an application for graduation during the prescribed period.
+        b. Candidates for graduation are required to accomplish their clearance before the final examinations of the last semester.
+  utter_graduation_honors:
+    - text: |
+        To qualify for honors upon graduation, a student must have:
+        1. Completed at least 75 percent of the total number of academic units for graduation in the college
+        2. Been in residence therein for at least three years immediately preceding graduation
+        3. No failing grade in any subject
+        4. Carried a normal load prescribed in the curriculum
+        5. Finished the course within the period or may be shorter but not longer than that prescribed in the curriculum and
+        6. Not been found guilty of any disciplinary case.
+        
+        7. The appropriate graduation honors and the prescribed General Weighted Average in all academic subjects for the entire duration of the program or course, shall be:
+        Honors General Weighted Average (GWA)
+        Summa Cum Laude  97% to 100%  (1.00-1.10)
+        - No rating less than 1.5(90%) in any subject
+        Magna Cum Laude  93% to 96%  (1.20-1.30)
+        - No rating less than 1.7(88%) in any subject
+        Cum Laude   90% to 92%  (1.40-1.50)
+        - No rating less than 2.0(85%) in any subject
+        Dean’s list award  88%-89% (1.60-1.70)
+        
+        8. Computation of the GWA shall be based on academic subjects only; non-academic subjects (ex. P.E., NSTP) are not included.
+        9. All candidates for Graduation Honors endorsed by the department shall undergo a validation process by a committee created for this purpose.
+  utter_school_library:
+    - text: |
+        The Abuyog Community College library is an integral part of the college which aims to provide effective informational support for the curriculum and for the scholarly and creative accomplishment of the students and faculty. It also serves as the venue for the students, faculty and staff members to keep abreast with current development in their field of interest.
+        
+        The library offers circulation, reserve, reference, bibliographic and advisory services.
+  utter_library_policies:
+    - text: |
+        Library Policies
+        1. Library hours are from 8:00am-12 noon and 1:00-5:00pm (no noon break)
+        2. Always wear your school I.D. and the prescribed school uniform.
+        3. Deposit your things at the bags counter upon entering the library. You may bring your valuables (wallet, cellphone, laptop and the like)
+        4. Help maintain a quite atmosphere for research. Silence in the library must be observed at all times.
+        5. Refrain from dragging your shoes and chairs when pulling them out for use.
+        6. Chatting, petty talks, group discussions regarding class projects or assignments, answering cellphone call and playing ringtones should be done outside the library premises or at the lounge area.
+        7. Sleeping, smoking, eating and all sorts of vandalism are strictly prohibited inside the library.
+        8. Each student is asked to help keep the library neat and orderly, and to push back chairs quietly before leaving the room.
+        9. All books taken out from the shelves should not be returned to the shelves. Place them on the table or on the book trucks provided for this purpose.
+        10. Treat the library materials you use with care. Do not cut or mutilate pages of books and periodicals.
+        11. Any person who uses an identification card not his owns shall have his privileges suspension for not more than one (1) semester.
+        Violation or infraction of library policies shall not be excused on the plea of ignorance and will be suspended from using the library facilities for a day or more depending on the gravity of offense.
+  utter_library_borrowing_rules:
+    - text: |
+        General Rules In Borrowing Books
+        1. The books and other reading materials are classified according to where they belong: Reserve Section, Filipiniana Section, Circulation Section and Periodical Section.
+        2. General references (dictionaries, encyclopedia, maps, atlas, gazetteers), periodicals, vertical files (pamphlets, clippings) journals, single copy of book, theses and dissertations are for LIBRARY use only and therefore cannot be loaned out. Photocopying is allowed, provided conditions in photocopying of said materials are met.
+        3. Books in the Reserve Section are only allowed for library and not allowed for overnight use, hence, students can borrow books in the said section by presenting their borrowers card to the one in-charge and be returned once he/she returned the book.
+        4. Books borrowed on Friday will be returned on Monday.
+        5. A bonafide user, which includes faculty, personnel and students are prohibited to borrow books for the purpose of lending it to others without prior consent of the librarian.
+        6. In case of loss of borrowed library materials as much as possible it should be replaced with exactly the same library materials, i.e. the same title, author, and edition; if unavailable, the present price of which shall be paid within 30 days. In event that the current price is not known, the following computation is observed. Five (5) pesos per page, for locally published books. Twenty (20) pesos per page for foreign books, or five (5) pesos per page for other library materials.
+        7. Fines and other library obligations should be settled with the librarian or library in-charge before or during the signing for current semester. Failure or refusal to need may mean to forfeiture of library privileges.
+        8. The money collected from fines shall be recorded accordingly, a copy of which shall be furnished to the Office of the College President and College Registrar for their information and reference. However, the amount shall be used for the purchase of needed library facilities with approval of the College President.
+  utter_library_loan_types:
+    - text: |
+        Loan Types:
+        HOURLY LOAN- reserve books are issued to a borrower for photocopying for a period of one hour only.
+        Failure to return the book within one (1) hour, the borrower will incur a fine of one (1) peso per hour.
+        PHOTOCOPYING OF BOOKS
+        The library fully recognizes that the works of authors are their intellectual property. Thus, the library is able to secure explicit permissions from authors or publishers to photocopy certain portions of their works. In this case their books are released to students for photocopying purposes.
+        OVERNIGHT LOAN - maximum of two (2) books in Circulation per student is allowed to be loaned for overnight use. They may be checked out from 2:30 to 4:00 pm. These books must have returned at or before 8:00 a.m. the following day.
+        Failure to return the book on its due date, the borrower will incur a fine of five (5) peso per hour and fifty (50) pesos per day.
+        WEEKLY LOAN - Novels/fictions are loaned for seven (7) days, they may be checked out from 2:30-4:00 p.m., and may be renewed for another seven (7) days.
+        MONTHLY LOAN - non-reserved books can be borrowed for month- long use. This is only applicable to non- academic personnel and faculty members.
+        
+        Fines:
+        Loan Type                    Fine Rate For Unreturned Books
+        Hourly loan (reserved books)         1.00 per hour for every book
+        Overnight loan (circulation books) P10.00 for one day and P1.00 per hour for every book
+        Weekly loan (fictions)                       P5.00 per day for every day
+  utter_library_services:
+    - text: |
+        Library Services
+        1. Library Orientation Programs- these are conducted with a tour of the different library sections and its physical arrangements.
+        2. Books Display- new books are displayed for about a month for the users to browse through before these can be loaned out.
+        3. Periodical Index- much of the information in the library are in the form of articles in periodicals, government publications and other available reports and bulletins; thus, periodical indices are constantly updated and provided for easy access by users.
+        4. Reference and Information Service- through this service, users will know how and where to locate their information needs.
+        5. Circulation- charging and discharging of books are done in this section including Filipiniana and Reserve Sections.
+        6. Vertical File Materials- these include clippings, pamphlets, brochures, booklets which are arranged in alphabetical order by subjects.
+  utter_student_activities_conduct:
+    - text: |
+        Students Activities
+        1. Conduct of Activities
+        Student activities must only be held upon approval from proper authorities. The following activities may be conducted by student organizations.
+        a. Community outreach/service
+        b. Educational activities
+        c. Socio-cultural activities
+        d. Recreational activities
+        e. Fund raising
+        f. Organizational development
+  utter_student_activities_permits:
+    - text: |
+        2. Processing Activity Permits
+        a. Secure a duly signed letter of request.
+        b. Submit the activity permit application to the OSA at least 5 working days before the proposed activity.
+        c. Any activity of the OSA recognized organization requires a written request and approval by the College President.
+        d. Permits may be revoked or cancelled whenever the circumstances so warrant, provided that reason(s) for such action is clearly indicated and explained to the students.
+        e. Accomplishment report shall be submitted a week after every Activity to the Office of the Student Affairs. Failure to submit the said report after 1 week without valid reason may be a cause for disapproval of succeeding permits.
+  utter_information_bulletins:
+    - text: |
+        3. Information Bulletins And Announcement
+        1. Must be written in English, Filipino or in vernacular.
+        2. Must be noted by OSA or any authorized personnel in his/her absence before posting; otherwise it shall be removed without prior notice to the organization concerned.
+        3. Must be posted on campus bulletin boards.
+        4. Must be removed after the activity to allow other groups to post their bills.
+  utter_organization_privileges:
+    - text: |
+        Privileges
+        Only recognized organizations may:
+        1. Use school facilities such as classrooms, grounds, lights and others with approval from proper authority/ies.
+        a. Property responsibility
+        The officers of student organizations concerned shall be jointly and/or severally liable for any damage or injury done to school properties/facilities arising from the use thereof by the organization
+        2. Participate in inter-organization activities/competitions
+        3. Compete in college-wide sponsored activities or contests by recognized organizations
+        4. Officially use the name of the school when engaging in off-campus activities
+        5. Have their organizational activities publicized in the student publications.
+  utter_support_pregnant_student:
+    - text: |
+        Support for Pregnant Student
+        Upon identification of the student being pregnant, referral to the school nurse for proper assessment must be made. The said student can receive support services such as referral, exemption on physical activities. Referral to the guidance counsellor must be made thereafter for counselling and guidance.
+  utter_support_persons_with_disability:
+    - text: |
+        Support for Persons with Disability
+        Disability is as defined as a physical or mental condition that limits a person’s movements, senses, or activities. This institution recognizes the same and provides privileges as deem fit to the identified disabled person. Ramps are provided within the campus for the convenience of handicapped students.
+  utter_credit_units:
+    - text: |
+        Credit and Units
+        One Collegiate unit of credit is one hour lecture/recitation each week for a total of 18 weeks in a semester. One unit of laboratory is equivalent to two-hour laboratory or shop work.
+  utter_grading_scale_and_marks:
+    - text: |
+        Grading System
+        Abuyog Community College uses number grades from 1 to 5 in which 1.0 is the highest and 5.0 is the lowest. Below is the percent equivalent of each numerical value:
+        GRADE EQUIVALENT
+        1.0    -       99-100
+        1.1    -       97-98
+        1.2    -       95-96
+        1.3    -       93-94
+        1.4    -       91-92
+        1.5    -         90
+        1.6    -         89
+        1.7    -         88
+        1.8    -         87
+        1.9    -         86
+        2.0    -         85
+        2.1    -        84
+        2.2    -        83
+        2.3    -        82
+        2.4    -        81
+        2.5    -        80
+        2.6    -        79
+        2.7    -        78
+        2.8    -        77
+        2.9    -        76
+        3.0    -        75
+        3.1 - 4.0 -       66-74 (conditional failure)
+        4.1-5.0    -  0-65 (Failed)
+        
+        1. INC. – is a mark given to a student who lacks requirements/examinations.
+        2. DROPPED - mark given to a student who officially withdraws from the subject and/or has incurred absences beyond 20% of the total number of regular classes.
+        3. An incomplete (INC) may be removed upon satisfactory compliance of the lacking requirements and/or passing the examination arranged by the teacher and the student.
+        4. An incomplete not removed within one (1) semester automatically becomes a 5.0 or lapsed.
+        5. Students who failed to take examinations on regular schedules may be given special examinations on schedules agreed upon by the teacher and the student.
+        6. The teacher shall personally submit to the Registrar’s Office the completed grade. If the teacher cannot personally submit the grade, the submission must be done by a duly authorized person.
+        - No rating less than 2.5(80%) in any subject
+  utter_commencement_exercise_attendance:
+    - text: |
+        a. All candidates for graduation should attend the baccalaureate and commencement exercises.
+        b. Graduating students who absent themselves from the commencement and baccalaureate exercises without valid excuse shall not be awarded their diploma or certificates until such time when they shall have attended the regular commencement and baccalaureate exercises.
+  utter_special_awards:
+    - text: |
+        Special Awards
+        Leadership Award - is given to students with exemplary service and contribution for the successful implementation of programs and projects in the campus.
+        Performing Arts Award - is given to any student or group who excel in the fields of music, dance, visual arts, theater arts, and literary works.
+        Outstanding Internship Award - is given to a senior student who has shown exemplary performance in their student internship/on-the-job training.
+  utter_student_campus_organization:
+    - text: |
+        Bona fide students may form and join organizations of their own choice as recognized by the Office of the Student Affairs provided that the purposes and activities of such organization are fully in accordance with the Filipino culture, ideas and traditions; provided further, that they are not contrary to the existing College rules and regulations; and provided finally that their purpose are not contrary to law, moral and public policy.
+        Unrecognized student organization shall not undertake any activities of any kind within the college premises, except with specific permit previously granted to it.
+        All student organizations should register with the Student Activities Officer under the Office of the Student Affairs and Services. Registration of student organization should be renewed at the start of every school year.
+  utter_requirements_for_recognition:
+    - text: |
+        A. For newly formed organizations
+        A duly accomplished application for recognition (forms to be secured at the OSA) must be submitted along with the following requirements:
+        1. Constitution and by-laws of the organization
+        2. List of members
+        3. List of officers with respective signatures
+        4. A copy of 2x2 ID photo of the head of organization
+        5. Workplan for the school year which includes:
+        a. Name/nature of activity
+        b. Objectives/goals
+        c. Proposed date of activity
+        d. Resources
+        e. Strategies
+        f. Target clientele
+        g. Expected outcome
+        6. Final list of at least 5 resident members with respective signatures
+        7. At least two advisers from the faculty/staff.
+        B. For existing organization (renewal)
+        Existing organization and those which were on probation during the previous semester/year that wish to continue must submit the following:
+        1. Revised constitution and by-laws, if any
+        2. Progress report (accomplishments/financial ) of preceding school year signed by the president and secretary and noted by the adviser/s.
+        3. Updated list of officers
+        4. Workplan for the school year
+        5. Final list of at least 5 resident members with respective signatures
+        6. At least two advisers from the faculty/staff.
+        7. A copy of 2x2 ID photo of the officers of the organization
+        2. Criteria for renewal
+        1. Must have accomplished all requirements
+        2. Must have embarked on various types of activities which are geared toward educational, socio-cultural, physical, economic or community development in realization of the basic objectives of the organization adopted from its own project-planning/feasibility studies for major projects.
+        3. Its members must have shown consciousness of their responsibilities in relation to their privileges as members of the organization, initiated and supported constructive programs and upheld the principles of the organization.
+        4. Must have followed rules and regulations set by the school and OSA; upheld the laws of the land and its constitution and by-laws.
+        5. For those organizations on suspension because of infraction of rules and regulations, they must have served the penalties given and sanctioned by the office or any appropriate body.
+        6. Organizations must not have violated any rules and regulations during and after the completion of the sanction/penalties given to the organization.
+  utter_officers:
+    - text: |
+        Officers
+        1. Qualifications
+        Must not have been found guilty of any disciplinary case or any act involving moral turpitude as defined by the Revised Penal Code and special laws.
+        2. Responsibilities
+        a. The main duties and responsibilities of officers should be those as specified in the organization’s constitution.
+        b. They must at all times exercise vigilance in the conduct of their affairs. They shall be held accountable for their actions as well as for those of their members.
+        c. Officers are expected to attend meetings called by the OSA on organization matters.
+  utter_advisers:
+    - text: |
+        Organization Advisers
+        1. Qualifications
+        a. Must be members of the ACC faculty and staff except OSA personnel.
+        b. May serve as adviser of not more than 2 student organizations.
+        c. Must not been found guilty of any disciplinary case or any act involving moral turpitude as defined by the Revised Penal Code and special laws.
+        2. Responsibilities
+        a. Must be actively involved in the making of the workplan of the organization
+        b. Must be present in any approved activity of the organization
+        c. Must be a signatory in any certified accomplished activity of the organization
+        d. Must evaluate and sign financial report of the organization
+        e. Must take the responsibility for any violations done by the Organization
+        f. Must do other tasks as may be required by the OSA and the President of the College
+        g. Must refer to the Office of the Student Affairs any problems encountered by the organization as a whole or by the individual members
+        h. Must instill among members positive attitudes towards service, leadership and sense of values.
+  utter_violations:
+    - text: |
+        Organizations Under Suspension
+        Organizations that are suspended are automatically deprived of all the privileges as provided in this handbook.
+        Upon satisfying the conditions and penalties set for the violation/s, the organization applies for reinstatement through formal communication subject to thorough evaluation.
+        
+        Suspension Of Organization And Activities
+        The following are grounds for suspension of organizations and activities:
+        1. Non-compliance of semestral/year-end requirements
+        2. Violation of any policies an organizations or other school rules and regulations
+  utter_penalties:
+    - text: |
+        Violations And Corresponding Penalties
+        1. Organization activities without permit.
+        1st offense - reprimand
+        2nd offense - 2 days suspension
+        3rd offense - 1 week suspension
+        4th offense - 1 month
+        5th offense - 1 semester
+        2. Ticket distribution without OSA seal
+        1st offense - reprimand
+        2nd offense - on probation for 1 semester
+        3rd offense - 1 year suspension of the organization
+        Continued violations of the same offense for more than three times will result in the disqualification from the official list of OSA-recognized organizations.
+        In addition to the revocation of the authority to operate, the student organization and the violator/s as well as the officers of the organizations may either be reprimanded, suspended, dropped or expelled from the rolls of the school depending on the seriousness of the offense committed.
+  utter_anti_sexual_harassment_policy:
+    - text: |
+        Section 1. The anti-sexual harassment policy of the College will be based on the provisions of Republic Act 7877, otherwise known as the Anti-Sexual Harassment Law.
+  utter_anti_violence_against_women_and_children_act:
+    - text: |
+        Section 1. The anti-violence against women and children policy of the College will be based on the provisions of Republic Act 9262, otherwise known as the Anti-Violence Against Women and Children Act.
+  utter_magna_carta_disabled_persons:
+    - text: |
+        The policy of the College on public ridicule and vilification against persons with disability will be based on the provisions of Republic Act 7277, otherwise known as the Magna Carta for Disabled Persons.
+  utter_republic_act_8049:
+    - text: |
+        AN ACT REGULATING HAZING AND OTHER FORMS OF INITIATION RITES IN FRATERNITIES, SORORITIES, AND ORGANIZATIONS AND PROVIDING PENALTIES THEREOF
+        
+        Section 1. Hazing as used in this Act is an initiation rite or practice as a prerequisite for admission into membership in fraternity, sorority or organization by placing a recruit, neophyte or applicant in some embarrassing or humiliating situation such as forcing him to do menial, silly, foolish and similar tasks or activities or otherwise subjecting him to physical or psychological suffering or injury.
+        
+        Section 2. No hazing or initiation rites in any form or manner by a fraternity, sorority or organization shall be allowed without prior written notice to the school authorities or head of organization seven days before the conduct of initiation. The written notice shall indicate the period of the initiation activities which shall not exceed three days, shall include the names of those subjected to such activities and shall further contain an undertaking that no physical violence be employed by anybody during such initiation rites.
+        
+        Section 3. The head of the school or organization or their representatives must assign at least two representatives of the school organization, as the case may be, to be present during the initiation. It is the duty of such representative to see to it that no physical harm of any kind shall be inflicted upon a recruit, neophyte or applicant.
+        
+        Section 4. If the person subjected to hazing or other forms of initiation rites suffers any physical injury or dies as a result thereof, the officers and members of the fraternity, sorority or organization who actually participated in the infliction of physical harm shall be liable as principals. The persons who participated in the hazing shall suffer the penalties prescribed in the Act depending on the consequences to the victim.
+  utter_republic_act_7877:
+    - text: |
+        REPUBLIC ACT 7877 AN ACT DECLARING SEXUAL HARASSMENT UNLAWFUL IN THE EMPLOYMENT, EDUCATION OR TRAINING ENVIRONMENT, AND FOR OTHER PURPOSES
+        
+        Section 1. Title- This Act shall be known as the Anti- Sexual Harassment Act of 1995.
+        
+        Section 2. Declaration of Policy- The State shall value the dignity of every individual, enhance the development of its human resources, guarantee full respect for human rights, and uphold the dignity of workers, employees, applicants for employment; students or those undergoing training, instruction or education. Towards this end, all forms of sexual harassment in the employment, education or training environment are hereby declared unlawful.
+  utter_administrative_order_no_35:
+    - text: |
+        ADMINISTRATIVE ORDER NO. 35 Directing All Departments, Bureaus, Government-Owned And/or Controlled Corporations, Government Financial Institutions, Local Government Units, State Universities/Colleges And Schools, And Other Government/ Instrumentalities To Promote And Conduct Relevant Activities During The Annual Observance Of The National Disability Prevention And Rehabilitation Week
+        
+        SECTION 1. The National Council for the Welfare of Disabled Persons will spearhead the holding of a series of activities involving government and private agencies to highlight the nation’s efforts towards disability prevention and rehabilitation leading to the effective integration of persons with disabilities into the mainstream of society.
+        SECTION 2. All departments, agencies, offices, GOCCs and LGUs and other government agencies/instrumentalities as well as the mass media and the entire citizenry are hereby required to extend their whole-hearted support and cooperation by conducting specific programs necessary to give effect to this order.
+  utter_appendix_e_off_campus_activities:
+    - text: |
+        REQUIREMENTS AND GUIDELINES ON LOCAL OFF-CAMPUS ACTIVITIES
+        All off-campus activities whether Curricular or Non-Curricular undertaken by any class, council, club or organization shall require permission and approval from the Office of Students Affairs, the Office of the Dean of College and the Office of the School President. The activities shall include but not be limited to the following:
+        1. Curricular
+        a. Educational Tours/Field trips
+        • Visits to reputable firms or government sites and other areas identified by the concerned local government units safe for students;
+        • Culture and arts related activities such as visits to museums, cultural sites, landmarks and other related venues; or
+        • Plant industry visit, host training establishment visit, and other related visits.
+        b. Participation and/or attendance in degree program-relevant events
+        c. Field Study/ Experiential Learning/ Related Learning Experience
+        2. Non-Curricular
+        • mission-based activities
+        conventions, seminars, conferences, symposiums, trainings and teambuilding;
+        volunteer work including peer helper programs, relief operations, community outreach and immersion;
+        advocacy projects and campaigns;
+        participation in sports activities;
+        activities initiated by recognized various student groups;
+        interschool competitions/tournaments; or
+        culture and arts performances and competition
+        Curricular activities are required off-campus activities and are an integral part of the instructional program. All students are expected to attend the scheduled off-campus activity since it is part of the regularly scheduled class time.
+        
+        a. Educational Tours refer to off-campus learning activities involving mobility of students with the supervision of authorized personnel outside the premises of the institution which lasts for more than one day, and involves relatively more places of destination than a field trip in accordance with specific degree program requirements.
+        b. Field Trips refer to off-campus learning activities involving mobility of students with the supervision of authorized personnel outside the premises of the institution but is of relatively shorter duration usually lasting for only one day and with fewer places of destination.
+        c. Field Study/Experiential Learning/Related Learning Experience refer to off-campus activities which are congruent to the learning outcomes of the course in terms of time and context. These activities require substantial off-campus learning as curriculum delivery.
+        
+        CURRICULAR ACTIVITIES
+        a. Every curricular activity shall require a permit duly submitted to the Office of Student Affairs, the Office of the Dean and the Office of the President.
+        b. No activity of such nature shall be permitted or allowed during the schedule of periodical examinations and after 8:30 in the evening of school days except on Fridays.
+        c. School equipment and facilities shall only be used upon the approval of the Personnel In-charge, the Office of Students Affairs, the Office of the Dean and the Office of the President.
+        d. No activity of any kind will be permitted without complying to the following requirements:
+        
+        BEFORE OFF-CAMPUS ACTIVITY
+        a. Curriculum – The activity must be part of the course syllabus.
+        b. Destination – As much as practicable the destination and schedule must be relevant to the subject matter. Whenever necessary for the safety and convenience of the participants, advance and proper coordination with the local government units with acknowledged letter from the concerned government agency shall be secured before the scheduled dates of activity.
+        c. Participants – All participants must be officially enrolled and must be included in the official list of participants with medical clearance and consent of parents or guardian.
+        d. Personnel-in-charge – ratio of 1 PIC to 35-50 students. The PIC must be an employee of the institution.
+        e. First Aid Kit – The institution must provide a complete first aid kit.
+        f. Fees – Students should only be charged for actual costs of transportation, entrance fees and other related expenses and must be properly accounted for.
+        g. Insurance – The institution must provide an insurance provision for the activity.
+        h. Transportation – Valid registration, insurance coverage, road worthiness, and licensed driver.
+        
+        DURING OFF-CAMPUS ACTIVITY
+        Personnel-in-charge must accompany and ensure safety, ensure allowable seating capacity, and ensure program of activities is properly followed or adjusted as needed.
+        
+        AFTER OFF-CAMPUS ACTIVITY
+        Students submit a learning journal. Faculty/PIC submit assessment, expenditure report, and conduct debriefing.
+  utter_general_information:
+    - text: |
+        GENERAL INFORMATION
+        The Office Of The Registrar
+        The Office of the Registrar coordinates and controls activities involving student registration, transfer, and graduation. The Office is primarily responsible for the updating and safekeeping of student records with strict confidentiality. The Office is also responsible for the enforcement of the rules and regulations of the Commission on Higher Education, TESDA and Department of Education regarding admission and transfer, accreditation of subjects and units, curricular load, sequence of subjects, etc. Inquiries concerning admission, curricular offerings and similar information are routinely referred to and handled by the Admission Section.
+  utter_adding_dropping_changing_subjects:
+    - text: |
+        Adding/Dropping/ Changing Of Subjects/Course/Program
+        1. A student who desires to add/drop/change the subject shall fill up the appropriate forms from the Registrar’s Office. He/she seeks approval from the Department Head, pays the appropriate amount and submit copies to Instructor, Registrar’s Office and retain own copy.
+        2. Adding/dropping/changing of subjects shall be done based on schedule given by the Registrar.
+        3. A student who voluntarily leaves the college shall be entitled to a certificate of Honorable Dismissal/ Transfer Certificate provided the following are met:
+        a. The student is not under suspension or expulsion;
+        b. He/She is eligible for transfer
+        c. He/She has no financial or property obligation to the College.
+  utter_shifting_to_another_program:
+    - text: |
+        Shifting To Another Program/Course
+        1. Go to the Guidance Office for referral.
+        2. Secure form for change of program from the Registrar’s Office.
+        3. Secure recent evaluation of grades.
+        4. Go to the Department Head concerned for crediting and loading of subjects.
+        5. Pay the corresponding shifting fee at the Cashier’s Office.
+        6. Submit the duly accomplished enrollment form to the Registrar’s Office for final evaluation.
+        7. Submit enrollment form to MIS Office.
+  utter_cross_enrollment:
+    - text: |
+        Cross Enrollment In Other Schools
+        Permit to cross enroll in other schools can only be granted if:
+        a. The applicant is graduating during the semester and the course is not offered in the college; or
+        b. The subject required for graduation is in conflict with another subject enrolled.
+        c. When the student intends to spend the school term in his home province or region and enrolls in a subject offered by an institution located therein.
+        The maximum number of units should not exceed the allowable regular units prescribed in the curriculum.
+        Procedure:
+        1. Write a letter of request to cross enroll in a certain school addressed to the Department Head.
+        2. Get Permit to Cross-Enroll from the School Registrar.
+        3. Proceed with your enrolment in the desired school.
+  utter_student_load:
+    - text: |
+        Student Load
+        Subject Load—The subject shall be in accordance with the approved curriculum for each degree program. Reasonable exceptions may be permitted taking into account the best interest of the student and the objectives of the educational system.
+        Advanced Subjects and Back Subjects—As a general rule, a student shall not be permitted to take any advanced subject until he has satisfactorily passed the pre-requisite subject or subjects. However, a student may be allowed to simultaneously enroll in pre-requisite and advance classes under the conditions as follows.
+        (1) When the pre-requisite is a repeated subject;
+        (2) When the student has a superior scholastic standing;
+        (3) When the student is graduating at the end of the school term; and
+        (4) when it is approved by the Dean or any authorized academic Official
+        Excess or Over Load —Upon the discretion of the higher education institution, a graduating student may be allowed additional subject-loads of not more than six academic units in excess of the normal load prescribed by the institution for the last school term. Likewise, a graduating student may, on a case-to-case basis, be allowed to take several Physical Education courses in a semester. The request for two or more basic PE subjects should include the name of the student, reasons, schedules, and endorsement of the Registrar with the statement Graduating upon the completion of the load.
+  utter_appendix_f:
+    - text: |
+        Appendix F: CMO no. 104 s. 2017
+        Revised Guidelines for Student Internship Program in the Philippines for all Programs
+  utter_board_of_trustees:
+    - text: |
+        THE BOARD OF TRUSTESS AS THE GOVERNING BODY
+        Created under Municipal Ordinance No. 5 s. 1987 and amended by Municipal Ordinance No. 3 s. 2005
+        Executive Chairman
+        College President
+        Chairman, Committee on Education
+        Retired Teachers Representative
+        Professional Group Representative
+        Workers Group Representative
+        Barangays Group Representative
+        Municipal Treasurer
+        BOT Secretary
+  utter_acc_hymn:
+    - text: |
+        ACC HYMN
+        Abuyog Community College
+        The emblem of love and devotion
+        Our hope for future ambition
+        To thee we’ll always arise.
+        Your dear sons and daughters
+        To thee our love is always
+        So long live
+        Abuyog Community College.
+        Repeat 3x
+  utter_student_conduct_and_discipline:
+    - text: |
+        Must Be Behavior of Students:
+        1. Wear the prescribed school uniform with the identification card/nameplates upon entering the campus and while inside the college premises.
+        1.1 All students are required to wear the prescribed uniform from Monday to Friday except Wednesday.
+        1.2 Special uniforms may be worn by students who are undergoing job trainings and vocational laboratories and those taking Physical education or NSTP for designated time and days only.
+        1.3. Only pregnant women are exempted from wearing the school uniform. She must present a medical certificate from her attending physician.
+        1.4. The following are considered inappropriate:
+        a. For Men: Sleeveless shirts, tattered pants, rubber slippers, sport sandals and shorts, earrings, make up, long or dyed color hair.
+        b. For Women: Blouses-shirts with plunging neckline, spaghetti strap, haltered shirts/blouses/dresses, mini-skirts, short pants, and rubber slippers.
+        2. Attend classes regularly and punctually. Tardiness of more than 15 minutes without justifiable reason constitutes an absence from the class.
+        3. Observe proper decorum (modesty and propriety) especially while inside the campus.
+        4. Attend social functions in attires appropriate for the occasions.
+        5. Keep abreast on school updates posted in the bulletin board of the college.
+        6. Observe library and laboratory rules and regulations while using the same.
+        7. Leave the room quietly and in an orderly manner when dismissed or given permission by the instructor to go out.
+        8. Protect status as student and the good name or reputation of the college.
+  utter_student_disciplinary_committee:
+    - text: |
+        A. Composition:
+        The Abuyog Community College Student Discipline Committee comprises:
+        · Prefect of Student as Chairman.
+        · The President of the Student Supreme Council (SSC) or his duly representative.
+        · Guidance Counselor
+        · Department Head of the students involved in the disciplinary cases
+        · OSA Coordinator
+        The School President may, in appropriate cases, designate an alternate Chairperson member whenever any of the person originally appointed to the position is unable to perform his duties, as herein provided due to personal interest, relationship or prolonged absence. Provide further, that the alternate so designate shall serve in capacity for the duration of the formal investigation of the particular case in which his appointment is made.
+        
+        B. Jurisdiction:
+        The Student Disciplinary Committee has jurisdiction over all involving student discipline and the imposition of sanctions.
+        
+        C. Student School Discipline Protocol
+        Formal complaints against student shall be filed before the Prefect of Discipline; complaints may come from faculty members, non-teaching employee, student and other persons concerned with the college (on a case to case basis as the OSA Coordinator may deem appropriate);
+        Summons to both complainants and respondents shall be given.
+        The Prefect Discipline will then conducts preliminary investigation on minor and major violations of students conduct and discipline and shall evidence including documents and materials as he may deem relevant.
+        The Prefect shall assess the gravity and complexity of the case and proceed to handle the same. Moreover, the prefect shall have authority to dismiss any complaint in his opinion is devoid of merit. Provided further, that when the students is found guilty of the offense, he may impose the penalties as provided for in this handbook and submits the same to the College President for notation upon receipt of the investigation results from the Prefect of Discipline.
+        If the decision is accepted by the student, the case is put to rest. If it is not acceptable, the decision is appealed to the Student Discipline Committee.
+        The Student Discipline Committee will then convene and conduct Formal Investigation of the matter at hand and deliberate the same. Decision shall then be render for final disposition of the case.
+  utter_mission_separate:
+    - text: |
+        MISSION
+        
+        Provide quality instruction in basic, post-secondary, and technical-vocational programs that enable the graduates to become holistically developed, possessing the attributes of competitiveness, analytical, resiliency, ethical, service-oriented.
 session_config:
   carry_over_slots_to_new_session: true
   session_expiration_time: 60
-
 entities:
 - username
 - name
 
-intents:
-- inform_username
-- inquire_enrollment
-
 actions:
-- flow_pattern_validate_slot
-- flow_pattern_search
+- utter_help
+- utter_help_user
+- end_conversation
+- utter_enrollment_procedure_freshman
+- utter_ask_did_that_help
+- utter_ask_enrollment_category
+- utter_ask_ticket_decision
+- utter_ask_ticket_details
 - flow_enrollment_flow
-- flow_pattern_continue_interrupted
-- utter_happy_response
+- flow_enrollment_requirements_flow
+- flow_enrollment_procedure_flow
+- flow_feedback_flow
+- flow_ticket_flow
+- flow_error_handler
 - flow_greet_flow
-- flow_pattern_cannot_handle
-- action_reset_bscrim_new
+- flow_pattern_correction
 - flow_pattern_cancel_flow
+- flow_pattern_cannot_handle
+- flow_pattern_chitchat
+- flow_pattern_clarification
+- flow_pattern_code_change
+- flow_pattern_collect_information
+- flow_pattern_completed
+- flow_pattern_continue_interrupted
+- flow_pattern_human_handoff
+- flow_pattern_internal_error
+- flow_pattern_repeat_bot_messages
+- flow_pattern_restart
+- flow_pattern_session_start
+- flow_pattern_skip_question
+- flow_pattern_user_silence
+- flow_pattern_validate_slot
+- utter_happy_response
+- action_reset_bscrim_new
 - increment_error_count
 - action_reset_ticket_decision
-- flow_pattern_skip_question
-- flow_pattern_code_change
-- flow_pattern_restart
-- utter_ask_enrollment_category
-- flow_enrollment_requirements_flow
-- flow_feedback_flow
 - utter_ask_student_question
 - action_reset_did_that_help
-- flow_pattern_clarification
 - create_ticket
-- flow_pattern_internal_error
-- flow_pattern_completed
-- utter_ask_did_that_help
-- flow_pattern_collect_information
-- flow_pattern_correction
-- flow_enrollment_procedure_flow
 - utter_enrollment_schedule
-- flow_ticket_flow
-- flow_pattern_chitchat
-- flow_pattern_user_silence
-- end_conversation
 - action_reset_enrollee_type
 - action_reset_enrollment_category
-- flow_pattern_human_handoff
-- flow_pattern_session_start
-- flow_pattern_repeat_bot_messages

@@ -1,0 +1,9 @@
+flows:
+  help_user:
+    description: Provides assistance to the user when the user says or typed the word help.
+    nlu_trigger:
+      - intent: help
+    steps:
+      - action: utter_help
+      - action: utter_suggest_create_ticket
+        next: END

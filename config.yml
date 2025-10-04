@@ -7,8 +7,26 @@ pipeline:
     model_group: rasa_command_generation_model
   flow_retrieval:
     active: false
-
+- name: WhitespaceTokenizer
+# - name: RegexFeaturizer
+# - name: RegexEntityExtractor
+- name: LexicalSyntacticFeaturizer
+- name: CountVectorsFeaturizer
+# - name: CountVectorsFeaturizer
+#   analyzer: "char_wb"
+#   min_ngram: 1
+#   max_ngram: 4
+- name: DIETClassifier
+  epochs: 150
+  random_seed: 1
+# - name: FallbackClassifier
+#   threshold: 0.7
+# - name: KeywordIntentClassifier
+#   case_sensitive: True
 policies:
 - name: FlowPolicy
 #  - name: EnterpriseSearchPolicy
+- name: TEDPolicy
+  max_history: 4
+  epochs: 100
 assistant_id: 20250908-173319-rounded-driver

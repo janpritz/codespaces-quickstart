@@ -1,0 +1,249 @@
+flows:
+  vision_flow:
+    description: Student asking for the ACC’s vision as printed in the student manual
+    steps:
+      - action: action_utter_vision
+  mission_flow:
+    description: Student asking for the ACC’s mission as printed in the student manual
+    steps:
+      - action: utter_mission
+  mission_separate_flow:
+    description: Student asking for the ACC’s mission with 'and' separated in response
+    steps:
+      - action: utter_mission_separate
+  core_values_flow:
+    description: Student asking for the ACC’s core values as printed in the student manual
+    steps:
+      - action: utter_core_values
+  goals_flow:
+    description: Student asking for the ACC’s goals as printed in the student manual
+    steps:
+      - action: utter_goals
+  office_of_the_registrar_flow:
+    description: The question asks for the Office of the Registrar responsibilities and how it coordinates student registration, transfer and graduation processes
+    steps:
+      - action: utter_office_of_the_registrar
+  admission_freshmen_flow:
+    description: Student asking what entrance credentials are required for incoming freshmen
+    steps:
+      - action: utter_admission_freshmen
+  admission_transferees_flow:
+    description: Student asking what documents are required for transferees
+    steps:
+      - action: utter_admission_transferees
+  admission_returning_flow:
+    description: Returning student asking what requirements are needed to re-enroll
+    steps:
+      - action: utter_admission_returning
+  bonafide_students_flow:
+    description: Student asking what defines a bonafide student of the school
+    steps:
+      - action: utter_bonafide_students
+  procedure_for_enrolment_flow:
+    description: Student asking for the step-by-step procedure for enrolment
+    steps:
+      - action: utter_procedure_for_enrolment
+  withdrawal_of_enrolment_flow:
+    description: Student asking about the rules and refund policy when withdrawing enrolment
+    steps:
+      - action: utter_withdrawal_of_enrolment
+  school_library_flow:
+    description: Student asking what the school library is and what services it offers
+    steps:
+      - action: utter_school_library
+  library_policies_flow:
+    description: Student asking for the library policies including hours required ID conduct and quiet rules
+    steps:
+      - action: utter_library_policies
+  library_borrowing_rules_flow:
+    description: Student asking for general rules in borrowing books including allowed sections and replacement policy
+    steps:
+      - action: utter_library_borrowing_rules
+  library_loan_types_flow:
+    description: Student asking for the different loan types including hourly overnight weekly and monthly and corresponding fines
+    steps:
+      - action: utter_library_loan_types
+  library_services_flow:
+    description: Student asking what library services are available such as orientation displays indices reference and circulation
+    steps:
+      - action: utter_library_services
+  acc_seal_flow:
+    description: The question asks for the elements of the ACC seal and the meaning of each emblem element
+    steps:
+      - action: utter_acc_seal
+  records_section_flow:
+    description: The question asks for the Records Section functions including issuance of credentials, transcripts, certifications and record confidentiality
+    steps:
+      - action: utter_records_section
+  evaluation_section_flow:
+    description: The question asks for the Evaluation Section duties for evaluating academic records, scheduling evaluations and graduation applications
+    steps:
+      - action: utter_evaluation_section
+  management_information_section_flow:
+    description: The question asks for the Management Information Section role in processing academic records and regulatory reports via computer facilities
+    steps:
+      - action: utter_management_information_section
+  office_of_student_affairs_flow:
+    description: The question asks for the Office of Student Affairs goals, services and role in student welfare and development
+    steps:
+      - action: utter_office_of_student_affairs
+  guidance_and_counseling_flow:
+    description: The question asks for guidance and counseling services including testing, information programs and student development activities
+    steps:
+      - action: utter_guidance_and_counseling
+  school_infirmary_flow:
+    description: The question asks for the school infirmary medical and dental services, clinic hours and procedures provided
+    steps:
+      - action: utter_school_infirmary
+  dental_services_flow:
+    description: The question asks for dental services available including examinations, consultations, procedures and counseling
+    steps:
+      - action: utter_dental_services
+  support_pregnant_student_flow:
+    description: Student asking what support and accommodations are provided for a pregnant student
+    steps:
+      - action: utter_support_pregnant_student
+  support_persons_with_disability_flow:
+    description: Student asking what support and privileges are provided for persons with disability on campus
+    steps:
+      - action: utter_support_persons_with_disability
+  student_retention_policy_flow:
+    description: The question asks for the student retention policy including the GWA cut-off and provisions for gifted or honor students
+    steps:
+      - action: utter_student_retention_policy
+  student_absences_flow:
+    description: The question asks for the attendance policy, the twenty percent absence rule and exemption provisions
+    steps:
+      - action: utter_student_absences
+  credit_units_flow:
+    description: Student asking what a collegiate unit of credit is and the laboratory unit equivalence
+    steps:
+      - action: utter_credit_units
+  grading_scale_and_marks_flow:
+    description: Student asking for the grading scale percent equivalents and policies on INC DROPPED special exams and grade submission
+    steps:
+      - action: utter_grading_scale_and_marks
+  graduation_flow:
+    description: The question asks for the application for graduation process and clearance requirements
+    steps:
+      - action: utter_graduation
+  graduation_honors_flow:
+    description: The question asks for qualifications, computation and required GWA for graduation honors and related validation process
+    steps:
+      - action: utter_graduation_honors
+  special_awards_flow:
+    description: The question asks for the special awards including leadership, performing arts and internship awards and their criteria
+    steps:
+      - action: utter_special_awards
+  commencement_exercise_attendance_flow:
+    description: The question asks for attendance requirements for baccalaureate and commencement exercises and consequences of absence
+    steps:
+      - action: utter_commencement_exercise_attendance
+  student_conduct_and_discipline_flow:
+    description: The question asks for expected student behavior, uniform rules, improper attire examples and sanctions for misconduct
+    steps:
+      - action: utter_student_conduct_and_discipline
+  student_disciplinary_committee_flow:
+    description: The question asks for the Student Disciplinary Committee composition, jurisdiction and protocol for handling discipline cases
+    steps:
+      - action: utter_student_disciplinary_committee
+  student_campus_organization_flow:
+    description: The question asks for student campus organizations formation, recognition, registration and permissible purposes
+    steps:
+      - action: utter_student_campus_organization
+  requirements_for_recognition_flow:
+    description: The question asks for the documentation and workplan requirements for both new and existing organizations seeking recognition
+    steps:
+      - action: utter_requirements_for_recognition
+  officers_flow:
+    description: The question asks for qualifications and responsibilities of organization officers
+    steps:
+      - action: utter_officers
+  advisers_flow:
+    description: The question asks for qualifications and responsibilities of organization advisers
+    steps:
+      - action: utter_officers
+  student_activities_conduct_flow:
+    description: Student asking what types of activities organizations may conduct upon approval
+    steps:
+      - action: utter_student_activities_conduct
+  student_activities_permits_flow:
+    description: Student asking how to process activity permits and when permits may be revoked
+    steps:
+      - action: utter_student_activities_permits
+  information_bulletins_flow:
+    description: Student asking the rules for information bulletins and announcements posting and removal
+    steps:
+      - action: utter_information_bulletins
+  organization_privileges_flow:
+    description: Student asking what privileges recognized organizations have including use of facilities participation and publicity
+    steps:
+      - action: utter_organization_privileges
+  penalties_flow:
+    description: The question asks for penalties for organizations and activities
+    steps:
+      - action: utter_penalties
+  violations_flow:
+    description: The question asks for violations for organizations and activities
+    steps:
+      - action: utter_violations
+  anti_sexual_harassment_policy_flow:
+    description: The question asks for the college anti-sexual harassment policy basis and institutional duties under RA 7877
+    steps:
+      - action: utter_anti_sexual_harassment_policy
+  anti_violence_against_women_and_children_act_flow:
+    description: The question asks for the college policy basis under the Anti-Violence Against Women and Children Act (RA 9262)
+    steps:
+      - action: utter_anti_violence_against_women_and_children_act
+  magna_carta_disabled_persons_flow:
+    description: The question asks for the college policy basis under the Magna Carta for Disabled Persons (RA 7277)
+    steps:
+      - action: utter_magna_carta_disabled_persons
+  republic_act_8049_flow:
+    description: The question asks for Republic Act No. 8049 provisions on hazing, required notices, presence of representatives and penalties
+    steps:
+      - action: utter_republic_act_8049
+  republic_act_7877_flow:
+    description: The question asks for Republic Act No. 7877 definitions, declaration of policy and duties of institutions regarding sexual harassment
+    steps:
+      - action: utter_republic_act_7877
+  administrative_order_no_35_flow:
+    description: The question asks for Administrative Order No. 35 directives for agencies to promote activities during the National Disability Prevention and Rehabilitation Week
+    steps:
+      - action: utter_administrative_order_no_35
+  appendix_e_off_campus_activities_flow:
+    description: The question asks for the requirements and guidelines for local off-campus curricular and non-curricular activities including before, during and after activity procedures
+    steps:
+      - action: utter_appendix_e_off_campus_activities
+  general_information_flow:
+    description: The question asks for the general information section content as presented in the manual
+    steps:
+      - action: utter_general_information
+  adding_dropping_changing_subjects_flow:
+    description: The question asks for the rules and procedures for adding, dropping and changing subjects or courses
+    steps:
+      - action: utter_adding_dropping_changing_subjects
+  shifting_to_another_program_flow:
+    description: The question asks for the step-by-step procedure to shift to another program or course
+    steps:
+      - action: utter_shifting_to_another_program
+  cross_enrollment_flow:
+    description: The question asks for the conditions and procedure for cross enrollment in other schools
+    steps:
+      - action: utter_cross_enrollment
+  student_load_flow:
+    description: The question asks for the student load policy including subject load, advanced/back subjects rules and overload provisions
+    steps:
+      - action: utter_student_load
+  appendix_f_flow:
+    description: The question asks for the Appendix F heading and reference to CMO no. 104 s. 2017 about student internship program
+    steps:
+      - action: utter_appendix_f
+  board_of_trustees_flow:
+    description: The question asks for the Board of Trustees composition and related headings as printed in the manual
+    steps:
+      - action: utter_board_of_trustees
+  acc_hymn_flow:
+    description: The asks for the ACC Hymn
+    steps:
+      - action: utter_acc_hymn

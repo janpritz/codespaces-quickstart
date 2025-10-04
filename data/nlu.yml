@@ -1,8 +1,0 @@
-version: "3.1"
-nlu:
-- intent: inform_username
-  examples: |
-    - hi i am [fritz](name)
-- intent: inquire_enrollment
-  examples: |
-    - need assistance with [enrollment](name)
