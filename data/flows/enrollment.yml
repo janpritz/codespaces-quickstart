@@ -24,7 +24,7 @@ flows:
         next: END
 
       - id: schedule_step
-        action: utter_enrollment_schedule
+        action: action_utter_enrollment_schedule
         next: feedback_step
 
       - id: clarify_step

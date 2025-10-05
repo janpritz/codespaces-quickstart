@@ -1,0 +1,133 @@
+slots:
+  language:
+    initial_value: en
+    is_builtin: true
+    mappings: []
+    type: strict_categorical
+    values:
+    - en
+  confirm_correction:
+    mappings:
+    - type: from_llm
+    type: bool
+  silence_timeout:
+    initial_value: 7.0
+    max_value: 1000000
+    type: float
+  consecutive_silence_timeouts:
+    initial_value: 0.0
+    max_value: 1000000
+    type: float
+  bscrim_new:
+    influence_conversation: true
+    mappings:
+    - condition: slots.enrollee_type = "Freshman" and slots.enrollment_category = "requirements"
+      type: from_llm
+    type: categorical
+    values:
+    - Yes
+    - No
+  clarified_question:
+    influence_conversation: true
+    initial_value: null
+    mappings:
+    - type: from_llm
+    type: text
+  confirm_slot_correction:
+    type: bool
+  enrollee_type:
+    influence_conversation: true
+    mappings:
+    - type: from_llm
+    type: categorical
+    validation:
+      refill_utter: utter_refill_enrollee_type
+      rejections:
+      - if: not ({'Freshman' 'Continuing' 'Returning' 'Transferee'} contains slots.enrollee_type)
+        utter: utter_invalid_enrollee_type
+    values:
+    - Freshman
+    - Continuing
+    - Returning
+    - Transferee
+  enrollment_category:
+    influence_conversation: true
+    mappings:
+    - type: from_llm
+    type: categorical
+    validation:
+      refill_utter: utter_refill_enrollment_category
+      rejections:
+      - if: not ({'procedure' 'requirements' 'schedule'} contains slots.enrollment_category)
+        utter: utter_invalid_enrollment_category
+    values:
+    - procedure
+    - requirements
+    - schedule
+  error_count:
+    influence_conversation: true
+    initial_value: 0
+    type: float
+  feedback:
+    initial_value: null
+    mappings:
+    - type: from_llm
+    type: categorical
+    validation:
+      refill_utter: utter_refill_feedback
+      rejections:
+      - if: not ({'Yes' 'No'} contains slots.feedback)
+        utter: utter_invalid_yes_no
+    values:
+    - Yes
+    - No
+  first_name:
+    initial_value: null
+    mappings:
+    - entity: student
+      type: from_llm
+    shared_for_coexistence: true
+    type: text
+  last_name:
+    initial_value: null
+    mappings:
+    - entity: student
+      type: from_llm
+    shared_for_coexistence: true
+    type: text
+  student_question:
+    influence_conversation: true
+    initial_value: null
+    mappings:
+    - type: from_llm
+    type: text
+  ticket_decision:
+    influence_conversation: true
+    mappings:
+    - condition: slots.ticket_creation = "Yes"
+      type: from_llm
+    type: categorical
+    values:
+    - Yes
+    - No
+  ticket_details:
+    mappings:
+    - type: controlled
+    type: text
+  username:
+    influence_conversation: false
+    initial_value: null
+    mappings:
+    - allow_nlu_correction: true
+      type: from_llm
+    - entity: user
+      type: from_entity
+    shared_for_coexistence: true
+    type: text
+  visited:
+    influence_conversation: false
+    initial_value: false
+    mappings:
+    - type: from_llm
+    shared_for_coexistence: true
+    type: bool

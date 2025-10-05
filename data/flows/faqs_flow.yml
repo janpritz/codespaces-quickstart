@@ -1,4 +1,12 @@
 flows:
+  acc_hymn_flow:
+    description: This flow handles question when the user asks about the ACC Hymn, such as "What is the ACC Hymn?" or requests to hear/see the hymn.
+    steps:
+      - action: action_utter_acc_hymn
+  enrollment_schedule_flow:
+    description: Student asking for the enrollment schedule of the current semester or this semester
+    steps:
+      - action: action_utter_enrollment_schedule
   vision_flow:
     description: Student asking for the ACC’s vision as printed in the student manual
     steps:
@@ -20,9 +28,9 @@ flows:
     steps:
       - action: action_utter_goals
   office_of_the_registrar_flow:
-    description: The question asks for the Office of the Registrar responsibilities and how it coordinates student registration, transfer and graduation processes
+    description: The question asks for the Office of the Registrar or Registrar or Registrars responsibilities and how it coordinates student registration, transfer and graduation processes
     steps:
-      - action: utter_office_of_the_registrar
+      - action: action_utter_office_of_the_registrar
   admission_freshmen_flow:
     description: Student asking what entrance credentials are required for incoming freshmen
     steps:
@@ -243,7 +251,4 @@ flows:
     description: The question asks for the Board of Trustees composition and related headings as printed in the manual
     steps:
       - action: utter_board_of_trustees
-  acc_hymn_flow:
-    description: The asks for the ACC Hymn lyrics
-    steps:
-      - action: action_utter_acc_hymn
+  

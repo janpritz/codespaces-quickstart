@@ -1,0 +1,25 @@
+intents:
+- help
+- enroll_returning
+- enrollment_procedure_freshmen
+- inform_username
+- inquire_enrollment
+- goodbye
+- student_support_services
+- payment_inquiries
+- student_account_status
+- exam_schedule
+- student_login_issue
+- course_registration_status
+- submit_ticket
+- student_records_request
+- transcript_request
+- greet
+- graduation_requirements
+- academic_advising_request
+- enroll_transferee
+- enroll_freshman
+- inquire_enrollment_category
+- require_bscrim_new
+- enroll_continuing
+- thanks

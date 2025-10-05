@@ -197,3 +197,63 @@ class ActionUtterACCHymn(Action):
         finally:
             connection.close()
         return []
+    
+class ActionUtterEnrollmentSchedule(Action):
+    def name(self) -> str:
+        return "action_utter_enrollment_schedule"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: dict):
+
+        connection = get_db_connection()
+        try:
+            with connection.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT response FROM faqs WHERE intent = 'Enrollment Schedule'")
+                results = cursor.fetchall()   # fetch ALL rows
+
+                if results:
+                    # Join all responses into one string
+                    responses = "\n".join([row["response"] for row in results if row.get("response")])
+                    dispatcher.utter_message(text=responses)
+                else:
+                    dispatcher.utter_message(
+                        text="Sorry, I am not yet trained to answer this question. You can submit a ticket for further assistance."
+                    )
+
+        except Exception as e:
+            dispatcher.utter_message(text=f"DB Error: {str(e)}")
+
+        finally:
+            connection.close()
+        return []
+
+class ActionUtterOfficeOfTheRegistrar(Action):
+    def name(self) -> str:
+        return "action_utter_office_of_the_registrar"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: dict):
+
+        connection = get_db_connection()
+        try:
+            with connection.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT response FROM faqs WHERE intent = 'Office of the Registrar'")
+                results = cursor.fetchall()   # fetch ALL rows
+
+                if results:
+                    # Join all responses into one string
+                    responses = "\n".join([row["response"] for row in results if row.get("response")])
+                    dispatcher.utter_message(text=responses)
+                else:
+                    dispatcher.utter_message(
+                        text="Sorry, I am not yet trained to answer this question. You can submit a ticket for further assistance."
+                    )
+
+        except Exception as e:
+            dispatcher.utter_message(text=f"DB Error: {str(e)}")
+
+        finally:
+            connection.close()
+        return []
