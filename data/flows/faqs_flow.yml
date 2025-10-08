@@ -251,4 +251,3 @@ flows:
     description: The question asks for the Board of Trustees composition and related headings as printed in the manual
     steps:
       - action: utter_board_of_trustees
-  

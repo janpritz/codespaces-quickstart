@@ -257,3 +257,22 @@ class ActionUtterOfficeOfTheRegistrar(Action):
         finally:
             connection.close()
         return []
+
+
+class ActionUtterAexamPolicy(Action):
+    def name(self) -> str:
+        return "action_utter_aexam_policy"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: dict) -> list:
+        reply = fetch_faq_response("aexam_policy")
+        dispatcher.utter_message(text=reply)
+        return []
+
+class ActionUtterAaexamPolicy(Action):
+    def name(self) -> str:
+        return "action_utter_aaexam_policy"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: dict) -> list:
+        reply = fetch_faq_response("aaexam_policy")
+        dispatcher.utter_message(text=reply)
+        return []
